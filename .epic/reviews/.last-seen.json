@@ -6,7 +6,7 @@
     "ILE-2": { "state": "Done", "status": "completed" },
     "ILE-3": { "state": "Done", "status": "completed" },
     "ILE-4": { "state": "Done", "status": "completed" },
-    "ILE-5": { "state": "Queued", "status": "open" },
+    "ILE-5": { "state": "Done", "status": "completed" },
     "ILE-6": { "state": "Queued", "status": "open" },
     "ILE-7": { "state": "Queued", "status": "open" },
     "ILE-8": { "state": "Queued", "status": "open" },
