@@ -4,8 +4,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { http, HttpResponse } from 'msw'
 import { createElement } from 'react'
 import { server } from '@/test/server'
-import { useMovements, useBatchesByProduct } from './queries'
+import { useMovements, useBatchesByProduct, useBatchesByPoId } from './queries'
 import { ApiError } from '@/api/errors'
+import { procurementKeys } from '@/data/procurement/keys'
 
 function makeWrapper(queryClient: QueryClient) {
   return function Wrapper({ children }: { children: React.ReactNode }) {
@@ -254,5 +255,96 @@ describe('useBatchesByProduct', () => {
     await waitFor(() => expect(result.current.isError).toBe(true))
     expect(ApiError.is(result.current.error)).toBe(true)
     expect((result.current.error as ApiError).status).toBe(401)
+  })
+})
+
+describe('useBatchesByPoId', () => {
+  const PO_WITH_2_LINES = {
+    id: 'po-1',
+    supplier_name: 'Acme',
+    supplier_contact: null,
+    status: 'received',
+    received_at: '2026-01-15T10:00:00Z',
+    created_at: '2026-01-01T00:00:00Z',
+    updated_at: '2026-01-15T10:00:00Z',
+    lines: [
+      {
+        id: 'line-1',
+        purchase_order_id: 'po-1',
+        product_id: 'prod-1',
+        quantity: '10.0000',
+        unit_cost: '5.0000',
+        created_at: '2026-01-01T00:00:00Z',
+      },
+      {
+        id: 'line-2',
+        purchase_order_id: 'po-1',
+        product_id: 'prod-2',
+        quantity: '20.0000',
+        unit_cost: '3.0000',
+        created_at: '2026-01-01T00:00:00Z',
+      },
+    ],
+  }
+
+  const makeBatch = (id: string, productId: string, lineId: string | null) => ({
+    id,
+    owner_id: 1,
+    product_id: productId,
+    purchase_order_line_id: lineId,
+    batch_code: `LOT-${id}`,
+    expiration_date: null,
+    unit_cost: '5.0000',
+    on_hand: '10.0000',
+    is_recalled: false,
+    recall_reason: null,
+    recalled_at: null,
+    archived_at: null,
+    created_at: '2026-01-15T10:00:00Z',
+    updated_at: '2026-01-15T10:00:00Z',
+  })
+
+  it('returns only the 2 PO-linked batches (one per PO line) out of 3 total per product', async () => {
+    // For prod-1: 3 batches — 1 linked to line-1, 2 others unlinked
+    const prod1Batches = [
+      makeBatch('batch-a', 'prod-1', 'line-1'), // PO-linked
+      makeBatch('batch-b', 'prod-1', null),       // not linked
+      makeBatch('batch-c', 'prod-1', null),       // not linked
+    ]
+    // For prod-2: 3 batches — 1 linked to line-2, 2 others unlinked
+    const prod2Batches = [
+      makeBatch('batch-d', 'prod-2', 'line-2'), // PO-linked
+      makeBatch('batch-e', 'prod-2', null),       // not linked
+      makeBatch('batch-f', 'prod-2', null),       // not linked
+    ]
+
+    server.use(
+      http.get('http://localhost:8000/api/v1/batches', ({ request }) => {
+        const url = new URL(request.url)
+        const productId = url.searchParams.get('product_id')
+        if (productId === 'prod-1') {
+          return HttpResponse.json({ items: prod1Batches, total: 3, limit: 200, offset: 0 })
+        }
+        if (productId === 'prod-2') {
+          return HttpResponse.json({ items: prod2Batches, total: 3, limit: 200, offset: 0 })
+        }
+        return HttpResponse.json({ items: [], total: 0, limit: 200, offset: 0 })
+      }),
+    )
+
+    const qc = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } })
+    // Seed the PO in the cache so useBatchesByPoId can read it
+    qc.setQueryData(procurementKeys.detail('po-1'), PO_WITH_2_LINES)
+
+    const { result } = renderHook(() => useBatchesByPoId('po-1'), {
+      wrapper: makeWrapper(qc),
+    })
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+    // Should return exactly 2 batches — one per PO line
+    expect(result.current.data?.items).toHaveLength(2)
+    const batchIds = result.current.data?.items.map((b) => b.id)
+    expect(batchIds).toContain('batch-a')
+    expect(batchIds).toContain('batch-d')
   })
 })

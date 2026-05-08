@@ -10,4 +10,6 @@ export const inventoryKeys = {
     [...inventoryKeys.all, 'movements', filters ?? {}] as const,
   batchesByProduct: (productId: string, opts?: Record<string, unknown>) =>
     [...inventoryKeys.all, 'batchesByProduct', productId, opts ?? {}] as const,
+  batchesByPo: (poId: string) =>
+    [...inventoryKeys.all, 'batchesByPo', poId] as const,
 }

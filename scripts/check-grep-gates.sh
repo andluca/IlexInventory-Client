@@ -21,16 +21,16 @@ fail() {
 # Gate 1: No bare fetch/axios in src/features/ or src/routes/
 # ---------------------------------------------------------------------------
 echo "Gate 1: no bare fetch/axios in features/routes..."
-if grep -RE "(fetch|axios)\(" src/features/ src/routes/ 2>/dev/null | grep -q .; then
+if grep -RE "\b(fetch|axios)\(" src/features/ src/routes/ 2>/dev/null | grep -q .; then
   fail "bare fetch/axios found in src/features/ or src/routes/"
-  grep -RE "(fetch|axios)\(" src/features/ src/routes/ 2>/dev/null || true
+  grep -RE "\b(fetch|axios)\(" src/features/ src/routes/ 2>/dev/null || true
 fi
 
 # ---------------------------------------------------------------------------
 # Gate 2: No bare fetch/axios anywhere outside data/api/csv-export
 # ---------------------------------------------------------------------------
 echo "Gate 2: no bare fetch/axios outside data/api/csv-export..."
-GATE2=$(grep -RE "(fetch|axios)\(" src/ --include='*.ts' --include='*.tsx' 2>/dev/null \
+GATE2=$(grep -RE "\b(fetch|axios)\(" src/ --include='*.ts' --include='*.tsx' 2>/dev/null \
   | grep -vE "src/data/|src/api/|src/utils/csv-export\.ts" || true)
 if [ -n "$GATE2" ]; then
   fail "bare fetch/axios found outside allowed paths:"
@@ -81,7 +81,7 @@ fi
 # (Duplicate-ish of gate 4, but enforced at data-layer imports too per SPEC §2.2)
 # Actually gate 7 from SPEC §4 is the NumberInput one — let me align exactly.
 # The seven greps from SPEC §4:
-#  1. grep -RE "(fetch|axios)\(" src/features/ src/routes/
+#  1. grep -RE "\b(fetch|axios)\(" src/features/ src/routes/
 #  2. grep -RE "(fetch|axios)\(" src/ ... | grep -vE "src/data/|src/api/|src/utils/csv-export\.ts"
 #  3. grep -RE "as any" ... | grep -v "src/api/generated"
 #  4. grep -RE "from ['\"].*api/generated" src/features/ src/routes/
