@@ -1,4 +1,14 @@
-# Implement Catalog (products) feature
+---
+id: ILE-4
+github_id: null
+status: open
+assignee: null
+state: Queued
+type: item
+depends_on: [ILE-3]
+---
+
+# ILE-4 Implement Catalog (products) feature
 
 ## Overview
 
@@ -8,12 +18,12 @@ Land the Products list (`/products`) and Product detail (`/products/:id`) pages 
 
 - [ ] `src/routes/products.index.tsx`, `products.$id.tsx`
 - [ ] `src/features/catalog/ProductsListPage.tsx`, `ProductDetailPage.tsx`, `NewProductModal.tsx`, `ImportCsvModal.tsx`, `ArchiveConfirmModal.tsx`, `DeleteConfirmModal.tsx`
-- [ ] `src/components/MovementAuditTable.tsx` (shared — also consumed by 006)
+- [ ] `src/components/MovementAuditTable.tsx` (shared — also consumed by ILE-6)
 - [ ] `src/data/catalog/queries.ts`, `mutations.ts`, `keys.ts`
-- [ ] `src/data/inventory/queries.ts` (movements query — shared with 006; lands here first)
+- [ ] `src/data/inventory/queries.ts` (movements query — shared with ILE-6; lands here first)
 - [ ] Tests: list pagination + filter, SKU lock UX, archive vs delete branching, CSV import with Idempotency-Key + per-row errors, 404 on cross-owner detail, optimistic update on name/description PATCH only
 
 ## Dependencies
 
-- 003
-- BE phase 6 (catalog endpoints live)
+- ILE-3 (app shell + auth)
+- BE phase 6 (catalog endpoints live) — already done per BE status (ILEX-004 completed).

@@ -1,4 +1,14 @@
-# Add Playwright E2E smoke + production deploy
+---
+id: ILE-10
+github_id: null
+status: open
+assignee: null
+state: Queued
+type: item
+depends_on: [ILE-9]
+---
+
+# ILE-10 Add Playwright E2E smoke + production deploy
 
 ## Overview
 
@@ -15,4 +25,4 @@ Land Playwright E2E smoke covering the critical flow per SPEC §5 phase 12: sign
 
 ## Dependencies
 
-- 009
+- ILE-9 (⌘K + polish)

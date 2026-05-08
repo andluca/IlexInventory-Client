@@ -1,4 +1,14 @@
-# Implement Procurement (purchase orders) feature
+---
+id: ILE-5
+github_id: null
+status: open
+assignee: null
+state: Queued
+type: item
+depends_on: [ILE-4]
+---
+
+# ILE-5 Implement Procurement (purchase orders) feature
 
 ## Overview
 
@@ -13,5 +23,5 @@ Land the POs list (`/purchase-orders`), draft new/edit (`/purchase-orders/new`, 
 
 ## Dependencies
 
-- 004
-- BE phase 7 (procurement endpoints live)
+- ILE-4 (catalog feature)
+- BE phase 7 (procurement endpoints live) — already done per BE status (ILEX-005 completed).

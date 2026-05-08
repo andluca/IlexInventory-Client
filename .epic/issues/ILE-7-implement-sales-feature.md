@@ -1,4 +1,14 @@
-# Implement Sales (sales orders) feature — draft, commit, void
+---
+id: ILE-7
+github_id: null
+status: open
+assignee: null
+state: Queued
+type: item
+depends_on: [ILE-6]
+---
+
+# ILE-7 Implement Sales (sales orders) feature — draft, commit, void
 
 ## Overview
 
@@ -13,5 +23,5 @@ Land SOs list (`/sales-orders`, cursor pagination via `useInfiniteQuery`), draft
 
 ## Dependencies
 
-- 006
-- BE phase 9 (sales endpoints live)
+- ILE-6 (inventory feature)
+- BE phase 9 (sales endpoints live) — **pending** per BE status (ILEX-007 not yet started). Will block here unless BE catches up.

@@ -1,4 +1,14 @@
-# Setup API client + OpenAPI type generation
+---
+id: ILE-2
+github_id: null
+status: open
+assignee: null
+state: Queued
+type: item
+depends_on: [ILE-1]
+---
+
+# ILE-2 Setup API client + OpenAPI type generation
 
 ## Overview
 
@@ -16,5 +26,5 @@ Wire `openapi-typescript` to regenerate `src/api/generated/` from the BE OpenAPI
 
 ## Dependencies
 
-- 001
-- BE OpenAPI available — BE phase 13 emits the schema; an interim hand-published snapshot at `docs/openapi.snapshot.json` is acceptable per SPEC §5 phase 2 to unblock parallel work.
+- ILE-1 (project tooling)
+- BE OpenAPI available — BE phase 13 emits the schema; per BE status, `/api/v1/openapi.json` is live now. Acceptable fallback per SPEC §5 phase 2: an interim hand-published snapshot at `docs/openapi.snapshot.json` to unblock parallel work.
