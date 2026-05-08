@@ -3,7 +3,7 @@ id: ILE-6
 github_id: null
 status: open
 assignee: null
-state: Queued
+state: Planning
 type: item
 depends_on: [ILE-5]
 ---
