@@ -1,11 +1,12 @@
 ---
 id: ILE-3
 github_id: null
-status: closed
+status: completed
 assignee: null
 state: Done
 type: item
 depends_on: [ILE-2]
+completed_at: "2026-05-08"
 ---
 
 # ILE-3 Build app shell + auth (login, sign-up, logout)

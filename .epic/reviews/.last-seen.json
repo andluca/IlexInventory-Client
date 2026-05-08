@@ -2,9 +2,9 @@
   "schema": 1,
   "snapshotAt": "2026-05-08T18:26:00Z",
   "states": {
-    "ILE-1": { "state": "Done", "status": "closed" },
-    "ILE-2": { "state": "Done", "status": "open" },
-    "ILE-3": { "state": "Done", "status": "closed" },
+    "ILE-1": { "state": "Done", "status": "completed" },
+    "ILE-2": { "state": "Done", "status": "completed" },
+    "ILE-3": { "state": "Done", "status": "completed" },
     "ILE-4": { "state": "Done", "status": "completed" },
     "ILE-5": { "state": "Queued", "status": "open" },
     "ILE-6": { "state": "Queued", "status": "open" },

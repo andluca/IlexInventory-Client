@@ -1,11 +1,12 @@
 ---
 id: ILE-1
 github_id: null
-status: closed
+status: completed
 assignee: null
 state: Done
 type: item
 depends_on: []
+completed_at: "2026-05-08"
 ---
 
 # ILE-1 Setup project tooling

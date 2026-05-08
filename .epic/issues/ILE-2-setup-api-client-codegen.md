@@ -1,11 +1,12 @@
 ---
 id: ILE-2
 github_id: null
-status: open
+status: completed
 assignee: null
 state: Done
 type: item
 depends_on: [ILE-1]
+completed_at: "2026-05-08"
 ---
 
 # ILE-2 Setup API client + OpenAPI type generation
