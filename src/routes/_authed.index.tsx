@@ -9,7 +9,7 @@ import { Title, Text, Stack, Anchor } from '@mantine/core'
  * The `floor:h-row-floor` class on the wrapper demonstrates the Tailwind
  * `floor:` variant compiles without error (acceptance criterion).
  */
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute('/_authed/')({
   component: IndexPage,
 })
 
