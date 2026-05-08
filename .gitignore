@@ -28,3 +28,9 @@ npm-debug.log*
 # TS project-references buildinfo + emitted declarations
 *.tsbuildinfo
 *.config.d.ts
+
+# Epic agent sessions
+.epic/sessions/
+
+# Claude Code agent state
+.claude/scheduled_tasks.lock
