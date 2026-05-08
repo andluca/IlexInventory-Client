@@ -19,7 +19,6 @@ export function CmdkTrigger() {
     openShell()
     if (import.meta.env.DEV && !warnedOnce) {
       warnedOnce = true
-      // eslint-disable-next-line no-console
       console.warn('[CmdkTrigger] Spotlight palette not yet wired (lands in ILE-9).')
     }
   }

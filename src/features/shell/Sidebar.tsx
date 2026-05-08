@@ -26,7 +26,7 @@ type NavItem = {
 
 const NAV_ITEMS: NavItem[] = [
   { to: '/', label: 'Dashboard', icon: IconLayoutDashboard, available: true },
-  { to: '/products', label: 'Products', icon: IconBox, available: false },
+  { to: '/products', label: 'Products', icon: IconBox, available: true },
   { to: '/purchase-orders', label: 'Purchase Orders', icon: IconTruckDelivery, available: false },
   { to: '/sales-orders', label: 'Sales Orders', icon: IconShoppingCart, available: false },
   { to: '/stock', label: 'Stock', icon: IconStack, available: false },

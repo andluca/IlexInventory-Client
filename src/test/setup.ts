@@ -38,6 +38,15 @@ Object.defineProperty(window, 'localStorage', {
 // This ensures tests use the same precision/rounding as the production app.
 Decimal.set({ precision: 28, rounding: Decimal.ROUND_HALF_EVEN })
 
+// jsdom doesn't implement ResizeObserver — Mantine's ScrollArea uses it.
+if (typeof window.ResizeObserver === 'undefined') {
+  window.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+}
+
 // jsdom doesn't implement window.matchMedia — Mantine's MantineProvider requires it.
 // Provide a minimal mock so MantineProvider mounts in tests.
 Object.defineProperty(window, 'matchMedia', {
