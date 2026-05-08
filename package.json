@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc -b && vite build",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . && npm run lint:gates",
     "lint:gates": "bash scripts/check-grep-gates.sh",
