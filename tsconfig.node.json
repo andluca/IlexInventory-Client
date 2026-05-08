@@ -12,6 +12,7 @@
     "isolatedModules": true,
     "composite": true,
     "emitDeclarationOnly": true,
+    "outDir": "node_modules/.cache/tsc-node",
 
     /* Strict */
     "strict": true
