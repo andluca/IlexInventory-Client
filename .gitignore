@@ -1,0 +1,30 @@
+# Design — ignore raw prototype source and screenshots; commit extracted artifacts (*.md)
+docs/design/screenshots/
+docs/design/prototype-source/
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Local env files (never commit these)
+.env.local
+.env.*.local
+
+# Vite cache
+.vite/
+
+# Test coverage
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor
+.DS_Store
+
+# TS project-references buildinfo + emitted declarations
+*.tsbuildinfo
+*.config.d.ts
