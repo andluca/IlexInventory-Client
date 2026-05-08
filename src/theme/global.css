@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Charcoal-only dark theme (design deviation #5 — no light mode in v1).
+ * The :root block defines CSS custom properties for Mantine-friendly tokens.
+ * There is NO light-mode block — drop it entirely.
+ */
+:root {
+  --radius: 0.5rem;
+
+  /* Focus ring */
+  --ring-color: oklch(0.72 0.19 155 / 0.5);
+  --ring-offset-color: oklch(0.145 0 0);
+}
+
+html {
+  /* Force dark unconditionally */
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-charcoal text-text font-sans;
+  font-variant-numeric: tabular-nums;
+}
