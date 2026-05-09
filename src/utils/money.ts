@@ -29,6 +29,47 @@ export function parseMoneyString(value: string): Decimal {
   }
 }
 
+export type FormatPercentOptions = {
+  fractionDigits?: number
+}
+
+/**
+ * Formats a percent string (e.g. "900.0000" from BE) for display.
+ *
+ * Returns "—" when input is null (BE-D13: margin_pct is null when COGS is 0).
+ * Uses Decimal.js for arithmetic so we never round through Number until display.
+ *
+ * Default fractionDigits: 0 for values ≥10%, 1 for values <10%.
+ *
+ * formatPercent("900.0000")  → "900%"
+ * formatPercent("12.5000")   → "12.5%"
+ * formatPercent(null)        → "—"
+ * formatPercent("0.0000")    → "0%"
+ */
+export function formatPercent(
+  value: string | null,
+  options?: FormatPercentOptions,
+): string {
+  if (value === null) return '—'
+
+  const decimal = parseMoneyString(value)
+
+  // When fractionDigits is explicitly provided, honour it exactly.
+  // Otherwise use min=0 / max=1 so whole numbers render without a trailing ".0"
+  // (e.g. "900%" not "900.0%") while fractional values keep one decimal place
+  // (e.g. "12.5%"). This satisfies all three BE-D13 worked examples.
+  const minFractionDigits = options?.fractionDigits !== undefined ? options.fractionDigits : 0
+  const maxFractionDigits = options?.fractionDigits !== undefined ? options.fractionDigits : 1
+
+  const formatter = new Intl.NumberFormat('en-US', {
+    style: 'decimal',
+    minimumFractionDigits: minFractionDigits,
+    maximumFractionDigits: maxFractionDigits,
+  })
+
+  return `${formatter.format(decimal.toNumber())}%`
+}
+
 export type FormatMoneyOptions = {
   currency?: string
   locale?: string

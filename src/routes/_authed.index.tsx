@@ -1,28 +1,31 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
-import { Title, Text, Stack, Anchor } from '@mantine/core'
+import { createFileRoute } from '@tanstack/react-router'
+import { DashboardPage } from '@/features/dashboard/DashboardPage'
 
 /**
- * Index route — minimal placeholder.
- * Proves the router works and `npm run dev` boots cleanly.
- * The real dashboard lands in issue 009 (after auth + shell are in place).
+ * Dashboard route — `/` (authenticated).
  *
- * The `floor:h-row-floor` class on the wrapper demonstrates the Tailwind
- * `floor:` variant compiles without error (acceptance criterion).
+ * Realizes R2 + R3 + F11 per SPEC §3.2 + §3.7.
+ * URL search params: from (ISO date), to (ISO date), expiring_within (positive int).
+ * Defaults: to=today, from=today-30d, expiring_within=30.
+ *
+ * ILE-8: replaced placeholder with full DashboardPage.
  */
 export const Route = createFileRoute('/_authed/')({
-  component: IndexPage,
+  validateSearch: (s: Record<string, unknown>) => {
+    return {
+      from: typeof s['from'] === 'string' ? s['from'] : undefined,
+      to: typeof s['to'] === 'string' ? s['to'] : undefined,
+      expiring_within:
+        typeof s['expiring_within'] === 'number'
+          ? s['expiring_within']
+          : typeof s['expiring_within'] === 'string'
+            ? Number(s['expiring_within'])
+            : undefined,
+    }
+  },
+  component: DashboardPageRoute,
 })
 
-function IndexPage() {
-  return (
-    <Stack p="xl" align="center" justify="center" mih="100vh">
-      <Title order={1}>Ilex Inventory</Title>
-      <Text c="dimmed">Dashboard coming in issue 009.</Text>
-      {/* floor: variant smoke test — invisible but confirms compilation */}
-      <div className="h-row-default floor:h-row-floor" aria-hidden="true" />
-      <Anchor component={Link} to="/login">
-        Go to Login →
-      </Anchor>
-    </Stack>
-  )
+function DashboardPageRoute() {
+  return <DashboardPage />
 }

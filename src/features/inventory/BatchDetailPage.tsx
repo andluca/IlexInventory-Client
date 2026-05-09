@@ -10,7 +10,7 @@
  * - MovementAuditTable for R6 movement audit
  */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from '@tanstack/react-router'
 import {
   Alert,
@@ -31,6 +31,9 @@ import { formatMoney } from '@/utils/money'
 import { formatQty } from '@/utils/qty'
 import type { BaseUnit } from '@/utils/qty'
 import { MovementAuditTable } from '@/components/MovementAuditTable'
+import { CsvExportButton } from '@/components/CsvExportButton'
+import { LoadingSkeleton } from '@/components/LoadingSkeleton'
+import { useActModalBus } from '@/stores/act-modal-bus'
 import { BatchMetadataEditor } from './BatchMetadataEditor'
 import { AdjustModal } from './AdjustModal'
 import { WriteOffModal } from './WriteOffModal'
@@ -49,10 +52,24 @@ export function BatchDetailPage({ batchId }: { batchId: string }) {
   const [unRecallOpen, setUnRecallOpen] = useState(false)
   const [manualBatchOpen, setManualBatchOpen] = useState(false)
 
+  // Act modal bus — opened from CmdkPalette (ILE-9 Step 8)
+  const busRequest = useActModalBus((s) => s.request)
+  const clearBus = useActModalBus((s) => s.clear)
+
+  useEffect(() => {
+    if (busRequest?.kind === 'recall' && busRequest.batchId === batchId) {
+      setRecallOpen(true)
+      clearBus()
+    } else if (busRequest?.kind === 'unrecall' && busRequest.batchId === batchId) {
+      setUnRecallOpen(true)
+      clearBus()
+    }
+  }, [busRequest, batchId, clearBus])
+
   if (batch.isLoading) {
     return (
       <Stack p="xl">
-        <Text c="dimmed">Loading…</Text>
+        <LoadingSkeleton rows={5} />
       </Stack>
     )
   }
@@ -216,12 +233,28 @@ export function BatchDetailPage({ batchId }: { batchId: string }) {
             Un-recall
           </Button>
         )}
+        <Button
+          component={Link}
+          to="/batches/$id/recall-report"
+          params={{ id: batchId } as never}
+          variant="light"
+          color="blue"
+        >
+          View recall report
+        </Button>
       </Group>
 
       {/* Movement audit */}
       <Card withBorder p="lg">
         <Stack>
-          <Title order={3}>Movement audit</Title>
+          <Group justify="space-between" align="center">
+            <Title order={3}>Movement audit</Title>
+            <CsvExportButton
+              path="/movements"
+              params={{ batch_id: batchId }}
+              label="Download audit CSV"
+            />
+          </Group>
           <MovementAuditTable batchId={batchId} />
         </Stack>
       </Card>

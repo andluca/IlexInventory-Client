@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { formatMoney, parseMoneyString } from './money'
+import { formatMoney, parseMoneyString, formatPercent } from './money'
 import Decimal from 'decimal.js'
 
 describe('formatMoney', () => {
@@ -36,6 +36,37 @@ describe('formatMoney', () => {
 
   it('formats large values with commas', () => {
     expect(formatMoney('1234567.8900')).toBe('$1,234,567.89')
+  })
+})
+
+describe('formatPercent', () => {
+  it('formats the brief worked example: "900.0000" → "900%"', () => {
+    // BE-D13 guard: the prototype rendered "90%" — this is the regression lock
+    expect(formatPercent('900.0000')).toBe('900%')
+  })
+
+  it('formats fractional values with 1 fraction digit: "12.5000" → "12.5%"', () => {
+    // max 1 fraction digit, min 0: fractional part is preserved up to 1dp
+    expect(formatPercent('12.5000')).toBe('12.5%')
+  })
+
+  it('returns "—" when input is null (BE-D13: margin_pct is null when COGS=0)', () => {
+    expect(formatPercent(null)).toBe('—')
+  })
+
+  it('formats "0.0000" → "0%" (whole number → no trailing decimal)', () => {
+    // min=0 max=1: 0.0000 rounds to 0 with no trailing .0
+    expect(formatPercent('0.0000')).toBe('0%')
+  })
+
+  it('formats values ≥10 with no fraction digit when whole: "66.6667" rounds to "66.7%"', () => {
+    // 66.6667 at max 1dp → "66.7%"
+    expect(formatPercent('66.6667')).toBe('66.7%')
+  })
+
+  it('formats "9.9999" → "10%" (rounds to whole number, no trailing decimal)', () => {
+    // 9.9999 at max 1dp rounds to 10.0; min=0 so displayed as "10%"
+    expect(formatPercent('9.9999')).toBe('10%')
   })
 })
 
