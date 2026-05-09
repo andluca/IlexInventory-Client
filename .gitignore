@@ -37,3 +37,10 @@ npm-debug.log*
 
 # Playwright CLI page snapshots (local-only debugging artifacts)
 .playwright-cli/
+
+# Playwright test output
+playwright-report/
+test-results/
+
+# Vercel deploy artifacts
+.vercel/

@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Generated client drift check
+        run: npm run generate:api -- --check
+        env:
+          # Force the snapshot fallback — no live BE in CI.
+          # Drift between client and snapshot is caught here.
+          # Drift between snapshot and live BE is a developer-side check.
+          VITE_OPENAPI_URL: ''
+
+      - name: Production build
+        run: npm run build
+        env:
+          # Required by src/main.tsx even at build time (fail-fast SPEC §2.10).
+          # Placeholder satisfies the check without leaking a real URL into CI logs.
+          # The deploy workflow injects the real URL via Vercel env config.
+          VITE_API_BASE_URL: 'https://placeholder.example.com/api/v1'

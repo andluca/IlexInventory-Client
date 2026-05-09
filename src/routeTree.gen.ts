@@ -27,6 +27,7 @@ import { Route as AuthedBatchesIdRouteImport } from './routes/_authed.batches.$i
 import { Route as AuthedSalesOrdersIdIndexRouteImport } from './routes/_authed.sales-orders.$id.index'
 import { Route as AuthedSalesOrdersIdEditRouteImport } from './routes/_authed.sales-orders.$id.edit'
 import { Route as AuthedPurchaseOrdersIdEditRouteImport } from './routes/_authed.purchase-orders.$id.edit'
+import { Route as AuthedBatchesIdRecallReportRouteImport } from './routes/_authed.batches.$id.recall-report'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -120,6 +121,12 @@ const AuthedPurchaseOrdersIdEditRoute =
     path: '/edit',
     getParentRoute: () => AuthedPurchaseOrdersIdRoute,
   } as any)
+const AuthedBatchesIdRecallReportRoute =
+  AuthedBatchesIdRecallReportRouteImport.update({
+    id: '/recall-report',
+    path: '/recall-report',
+    getParentRoute: () => AuthedBatchesIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthedIndexRoute
@@ -127,7 +134,7 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/settings': typeof AuthedSettingsRoute
   '/stock': typeof AuthedStockRoute
-  '/batches/$id': typeof AuthedBatchesIdRoute
+  '/batches/$id': typeof AuthedBatchesIdRouteWithChildren
   '/products/$id': typeof AuthedProductsIdRoute
   '/purchase-orders/$id': typeof AuthedPurchaseOrdersIdRouteWithChildren
   '/purchase-orders/new': typeof AuthedPurchaseOrdersNewRoute
@@ -136,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/products/': typeof AuthedProductsIndexRoute
   '/purchase-orders/': typeof AuthedPurchaseOrdersIndexRoute
   '/sales-orders/': typeof AuthedSalesOrdersIndexRoute
+  '/batches/$id/recall-report': typeof AuthedBatchesIdRecallReportRoute
   '/purchase-orders/$id/edit': typeof AuthedPurchaseOrdersIdEditRoute
   '/sales-orders/$id/edit': typeof AuthedSalesOrdersIdEditRoute
   '/sales-orders/$id/': typeof AuthedSalesOrdersIdIndexRoute
@@ -146,7 +154,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthedSettingsRoute
   '/stock': typeof AuthedStockRoute
   '/': typeof AuthedIndexRoute
-  '/batches/$id': typeof AuthedBatchesIdRoute
+  '/batches/$id': typeof AuthedBatchesIdRouteWithChildren
   '/products/$id': typeof AuthedProductsIdRoute
   '/purchase-orders/$id': typeof AuthedPurchaseOrdersIdRouteWithChildren
   '/purchase-orders/new': typeof AuthedPurchaseOrdersNewRoute
@@ -154,6 +162,7 @@ export interface FileRoutesByTo {
   '/products': typeof AuthedProductsIndexRoute
   '/purchase-orders': typeof AuthedPurchaseOrdersIndexRoute
   '/sales-orders': typeof AuthedSalesOrdersIndexRoute
+  '/batches/$id/recall-report': typeof AuthedBatchesIdRecallReportRoute
   '/purchase-orders/$id/edit': typeof AuthedPurchaseOrdersIdEditRoute
   '/sales-orders/$id/edit': typeof AuthedSalesOrdersIdEditRoute
   '/sales-orders/$id': typeof AuthedSalesOrdersIdIndexRoute
@@ -166,7 +175,7 @@ export interface FileRoutesById {
   '/_authed/settings': typeof AuthedSettingsRoute
   '/_authed/stock': typeof AuthedStockRoute
   '/_authed/': typeof AuthedIndexRoute
-  '/_authed/batches/$id': typeof AuthedBatchesIdRoute
+  '/_authed/batches/$id': typeof AuthedBatchesIdRouteWithChildren
   '/_authed/products/$id': typeof AuthedProductsIdRoute
   '/_authed/purchase-orders/$id': typeof AuthedPurchaseOrdersIdRouteWithChildren
   '/_authed/purchase-orders/new': typeof AuthedPurchaseOrdersNewRoute
@@ -175,6 +184,7 @@ export interface FileRoutesById {
   '/_authed/products/': typeof AuthedProductsIndexRoute
   '/_authed/purchase-orders/': typeof AuthedPurchaseOrdersIndexRoute
   '/_authed/sales-orders/': typeof AuthedSalesOrdersIndexRoute
+  '/_authed/batches/$id/recall-report': typeof AuthedBatchesIdRecallReportRoute
   '/_authed/purchase-orders/$id/edit': typeof AuthedPurchaseOrdersIdEditRoute
   '/_authed/sales-orders/$id/edit': typeof AuthedSalesOrdersIdEditRoute
   '/_authed/sales-orders/$id/': typeof AuthedSalesOrdersIdIndexRoute
@@ -196,6 +206,7 @@ export interface FileRouteTypes {
     | '/products/'
     | '/purchase-orders/'
     | '/sales-orders/'
+    | '/batches/$id/recall-report'
     | '/purchase-orders/$id/edit'
     | '/sales-orders/$id/edit'
     | '/sales-orders/$id/'
@@ -214,6 +225,7 @@ export interface FileRouteTypes {
     | '/products'
     | '/purchase-orders'
     | '/sales-orders'
+    | '/batches/$id/recall-report'
     | '/purchase-orders/$id/edit'
     | '/sales-orders/$id/edit'
     | '/sales-orders/$id'
@@ -234,6 +246,7 @@ export interface FileRouteTypes {
     | '/_authed/products/'
     | '/_authed/purchase-orders/'
     | '/_authed/sales-orders/'
+    | '/_authed/batches/$id/recall-report'
     | '/_authed/purchase-orders/$id/edit'
     | '/_authed/sales-orders/$id/edit'
     | '/_authed/sales-orders/$id/'
@@ -373,8 +386,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedPurchaseOrdersIdEditRouteImport
       parentRoute: typeof AuthedPurchaseOrdersIdRoute
     }
+    '/_authed/batches/$id/recall-report': {
+      id: '/_authed/batches/$id/recall-report'
+      path: '/recall-report'
+      fullPath: '/batches/$id/recall-report'
+      preLoaderRoute: typeof AuthedBatchesIdRecallReportRouteImport
+      parentRoute: typeof AuthedBatchesIdRoute
+    }
   }
 }
+
+interface AuthedBatchesIdRouteChildren {
+  AuthedBatchesIdRecallReportRoute: typeof AuthedBatchesIdRecallReportRoute
+}
+
+const AuthedBatchesIdRouteChildren: AuthedBatchesIdRouteChildren = {
+  AuthedBatchesIdRecallReportRoute: AuthedBatchesIdRecallReportRoute,
+}
+
+const AuthedBatchesIdRouteWithChildren = AuthedBatchesIdRoute._addFileChildren(
+  AuthedBatchesIdRouteChildren,
+)
 
 interface AuthedPurchaseOrdersIdRouteChildren {
   AuthedPurchaseOrdersIdEditRoute: typeof AuthedPurchaseOrdersIdEditRoute
@@ -407,7 +439,7 @@ interface AuthedRouteChildren {
   AuthedSettingsRoute: typeof AuthedSettingsRoute
   AuthedStockRoute: typeof AuthedStockRoute
   AuthedIndexRoute: typeof AuthedIndexRoute
-  AuthedBatchesIdRoute: typeof AuthedBatchesIdRoute
+  AuthedBatchesIdRoute: typeof AuthedBatchesIdRouteWithChildren
   AuthedProductsIdRoute: typeof AuthedProductsIdRoute
   AuthedPurchaseOrdersIdRoute: typeof AuthedPurchaseOrdersIdRouteWithChildren
   AuthedPurchaseOrdersNewRoute: typeof AuthedPurchaseOrdersNewRoute
@@ -422,7 +454,7 @@ const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedSettingsRoute: AuthedSettingsRoute,
   AuthedStockRoute: AuthedStockRoute,
   AuthedIndexRoute: AuthedIndexRoute,
-  AuthedBatchesIdRoute: AuthedBatchesIdRoute,
+  AuthedBatchesIdRoute: AuthedBatchesIdRouteWithChildren,
   AuthedProductsIdRoute: AuthedProductsIdRoute,
   AuthedPurchaseOrdersIdRoute: AuthedPurchaseOrdersIdRouteWithChildren,
   AuthedPurchaseOrdersNewRoute: AuthedPurchaseOrdersNewRoute,
