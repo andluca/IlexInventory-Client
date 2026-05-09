@@ -27,6 +27,7 @@ import { notifications } from '@mantine/notifications'
 import { usePo } from '@/data/procurement/queries'
 import { useDeletePo } from '@/data/procurement/mutations'
 import { ApiError } from '@/api/errors'
+import { LoadingSkeleton } from '@/components/LoadingSkeleton'
 import { ReceiveModal } from './ReceiveModal'
 
 export function PoDetailPage({ poId }: { poId: string }) {
@@ -39,7 +40,7 @@ export function PoDetailPage({ poId }: { poId: string }) {
   if (po.isLoading) {
     return (
       <Stack p="xl">
-        <Text c="dimmed">Loading…</Text>
+        <LoadingSkeleton rows={5} />
       </Stack>
     )
   }

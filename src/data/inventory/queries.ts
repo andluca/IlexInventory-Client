@@ -21,6 +21,8 @@ import type { components } from '@/api/generated/schema'
 export type MovementListResponse = components['schemas']['MovementListResponse']
 export type BatchListResponse = components['schemas']['BatchListResponse']
 export type BatchResponse = components['schemas']['BatchResponse']
+export type RecallReportResponse = components['schemas']['RecallReportResponse']
+export type RecallReportItemResponse = components['schemas']['RecallReportItemResponse']
 
 // ---------------------------------------------------------------------------
 // useMovements
@@ -75,16 +77,18 @@ export function useMovements(
 
 export interface BatchesByProductOpts {
   limit?: number
+  enabled?: boolean
 }
 
 export function useBatchesByProduct(
   productId: string,
   opts: BatchesByProductOpts = {},
 ): UseQueryResult<BatchListResponse, ApiError> {
-  const { limit = 1 } = opts
+  const { limit = 1, enabled = true } = opts
 
   return useQuery<BatchListResponse, ApiError>({
     queryKey: inventoryKeys.batchesByProduct(productId, { limit }),
+    enabled,
     queryFn: async () => {
       const { data } = await apiClient.GET('/api/v1/batches', {
         params: {
@@ -224,5 +228,41 @@ export function useBatchesByPoId(poId: string): UseQueryResult<BatchListResponse
       }
     },
     staleTime: 30_000,
+  })
+}
+
+// ---------------------------------------------------------------------------
+// useRecallReport
+// ---------------------------------------------------------------------------
+//
+// Offset-paginated query for the recall report of a batch.
+// Endpoint: GET /batches/{batch_id}/recall-report
+// staleTime: 0 — recall reports must reflect current allocations.
+
+export interface RecallReportParams {
+  page?: number
+  limit?: number
+}
+
+export function useRecallReport(
+  batchId: string,
+  params: RecallReportParams = {},
+): UseQueryResult<RecallReportResponse, ApiError> {
+  const { page = 1, limit = 50 } = params
+  const offset = (page - 1) * limit
+
+  return useQuery<RecallReportResponse, ApiError>({
+    queryKey: inventoryKeys.recallReport(batchId, { page, limit }),
+    enabled: Boolean(batchId),
+    queryFn: async () => {
+      const { data } = await apiClient.GET('/api/v1/batches/{batch_id}/recall-report', {
+        params: {
+          path: { batch_id: batchId },
+          query: { limit, offset },
+        },
+      })
+      return data as RecallReportResponse
+    },
+    staleTime: 0,
   })
 }

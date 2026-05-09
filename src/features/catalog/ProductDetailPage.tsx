@@ -29,6 +29,8 @@ import { useProduct } from '@/data/catalog/queries'
 import { useUpdateProduct } from '@/data/catalog/mutations'
 import { useBatchesByProduct } from '@/data/inventory/queries'
 import { ApiError } from '@/api/errors'
+import { useActModalBus } from '@/stores/act-modal-bus'
+import { LoadingSkeleton } from '@/components/LoadingSkeleton'
 import { MovementAuditTable } from '@/components/MovementAuditTable'
 import { ArchiveConfirmModal } from './ArchiveConfirmModal'
 import { DeleteConfirmModal } from './DeleteConfirmModal'
@@ -48,6 +50,16 @@ export function ProductDetailPage() {
 
   const [archiveModalOpen, setArchiveModalOpen] = useState(false)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+
+  // Act modal bus — opened from CmdkPalette (ILE-9 Step 8)
+  const busRequest = useActModalBus((s) => s.request)
+  const clearBus = useActModalBus((s) => s.clear)
+  useEffect(() => {
+    if (busRequest?.kind === 'archive' && busRequest.productId === id) {
+      setArchiveModalOpen(true)
+      clearBus()
+    }
+  }, [busRequest, id, clearBus])
 
   const form = useForm({
     initialValues: {
@@ -113,7 +125,7 @@ export function ProductDetailPage() {
   if (isLoading || !product) {
     return (
       <Box p="md">
-        <Text c="dimmed">Loading…</Text>
+        <LoadingSkeleton rows={5} />
       </Box>
     )
   }

@@ -233,4 +233,35 @@ describe('SoDetailPage', () => {
       expect(router.state.location.pathname).toBe('/sales-orders/so-draft/edit')
     })
   })
+
+  // ---------------------------------------------------------------------------
+  // ILE-9 Step 8: Act modal bus wiring
+  // ---------------------------------------------------------------------------
+
+  it('act-bus void request opens VoidConfirmModal', async () => {
+    const { useActModalBus } = await import('@/stores/act-modal-bus')
+    useActModalBus.setState({ request: null })
+
+    server.use(
+      http.get('http://localhost:8000/api/v1/sales-orders/so-1', () =>
+        HttpResponse.json(SO_COMMITTED),
+      ),
+    )
+
+    const router = await makeRouter('so-1')
+    await renderWithRouter(router)
+
+    await waitFor(() => {
+      expect(screen.getByText('Acme Corp')).toBeInTheDocument()
+    })
+
+    // Fire the bus request
+    useActModalBus.setState({ request: { kind: 'void', soId: 'so-1' } })
+
+    await waitFor(() => {
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
+    })
+
+    expect(useActModalBus.getState().request).toBeNull()
+  })
 })

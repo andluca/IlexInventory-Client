@@ -210,7 +210,7 @@ describe('SosListPage', () => {
     })
   })
 
-  it('empty no-filters: shows "No sales orders yet" + New SO CTA', async () => {
+  it('empty no-filters: shows "No sales orders yet" + New SO CTA + Ask Ilex agent-prompt', async () => {
     server.use(
       http.get('http://localhost:8000/api/v1/sales-orders', () =>
         HttpResponse.json({ items: [], next_cursor: null }),
@@ -226,6 +226,9 @@ describe('SosListPage', () => {
 
     // New SO CTA
     expect(screen.getAllByRole('link', { name: /new so/i }).length).toBeGreaterThan(0)
+
+    // Agent prompt button
+    expect(screen.getByRole('button', { name: /ask ilex/i })).toBeInTheDocument()
   })
 
   it('row click: navigate to /sales-orders/$id/edit for draft; /sales-orders/$id for committed', async () => {

@@ -303,4 +303,41 @@ describe('SoDraftPage', () => {
     // Admin override disclosure button is present
     expect(screen.getByRole('button', { name: /edit allocations.*admin override/i })).toBeInTheDocument()
   })
+
+  // ---------------------------------------------------------------------------
+  // ILE-9 Step 8: Act modal bus wiring
+  // ---------------------------------------------------------------------------
+
+  it('act-bus commit request opens CommitConfirmModal', async () => {
+    const { useActModalBus } = await import('@/stores/act-modal-bus')
+    useActModalBus.setState({ request: null })
+
+    server.use(
+      http.get('http://localhost:8000/api/v1/products', () =>
+        HttpResponse.json(PRODUCTS_LIST),
+      ),
+      http.get('http://localhost:8000/api/v1/sales-orders/so-1', () =>
+        HttpResponse.json(SO_DRAFT),
+      ),
+      http.post('http://localhost:8000/api/v1/sales-orders/so-1/preview', () =>
+        HttpResponse.json({ allocations: [] }),
+      ),
+    )
+
+    const router = await makeRouter('edit', 'so-1')
+    await renderWithRouter(router)
+
+    await waitFor(() => {
+      expect((screen.getByLabelText(/customer name/i) as HTMLInputElement).value).toBe('Acme Corp')
+    })
+
+    // Fire the bus request
+    useActModalBus.setState({ request: { kind: 'commit' } })
+
+    await waitFor(() => {
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
+    })
+
+    expect(useActModalBus.getState().request).toBeNull()
+  })
 })

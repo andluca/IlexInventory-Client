@@ -25,6 +25,8 @@ import {
 import { IconPlus, IconSearch } from '@tabler/icons-react'
 import { useSosList } from '@/data/sales/queries'
 import { ApiError } from '@/api/errors'
+import { LoadingSkeleton } from '@/components/LoadingSkeleton'
+import { EmptyState } from '@/components/EmptyState'
 
 type StatusFilter = 'all' | 'draft' | 'committed' | 'voided'
 
@@ -125,23 +127,17 @@ export function SosListPage() {
         </Alert>
       )}
 
-      {list.isLoading && <Text c="dimmed">Loading…</Text>}
+      {list.isLoading && <LoadingSkeleton rows={5} />}
 
       {list.isSuccess && allItems.length === 0 && !hasFilters && (
-        <Box ta="center" py="xl">
-          <Text c="dimmed">
-            No sales orders yet. Draft your first SO to see FEFO in action.
-          </Text>
-          <Button
-            mt="md"
-            component={Link}
-            to="/sales-orders/new"
-            leftSection={<IconPlus size={14} />}
-            aria-label="New SO"
-          >
-            New SO
-          </Button>
-        </Box>
+        <EmptyState
+          title="No sales orders yet"
+          body="Draft your first SO to see FEFO in action."
+          actions={[
+            { label: 'New SO', href: '/sales-orders/new', primary: true },
+          ]}
+          agentPrompt="Create an SO for recent customer?"
+        />
       )}
 
       {list.isSuccess && allItems.length === 0 && hasFilters && (

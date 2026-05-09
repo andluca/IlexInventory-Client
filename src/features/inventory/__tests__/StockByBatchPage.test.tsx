@@ -234,7 +234,7 @@ describe('StockByBatchPage', () => {
     })
   })
 
-  it('empty no-filters: renders "No batches yet" empty state with New batch CTA', async () => {
+  it('empty no-filters: renders "No batches yet" EmptyState with New batch + New PO actions', async () => {
     server.use(
       http.get('http://localhost:8000/api/v1/batches', () =>
         HttpResponse.json({ items: [], total: 0, limit: 50, offset: 0 }),
@@ -252,6 +252,8 @@ describe('StockByBatchPage', () => {
     })
     // New batch CTA should be present
     expect(screen.getAllByRole('button', { name: /new batch/i }).length).toBeGreaterThan(0)
+    // New PO link action
+    expect(screen.getByRole('link', { name: /new po/i })).toBeInTheDocument()
   })
 
   it('row click: navigates to /batches/{id}', async () => {

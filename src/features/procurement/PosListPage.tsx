@@ -24,6 +24,8 @@ import {
 import { IconPlus, IconSearch } from '@tabler/icons-react'
 import { usePosList } from '@/data/procurement/queries'
 import { ApiError } from '@/api/errors'
+import { LoadingSkeleton } from '@/components/LoadingSkeleton'
+import { EmptyState } from '@/components/EmptyState'
 
 type StatusFilter = 'draft' | 'received' | 'all'
 
@@ -57,6 +59,7 @@ export function PosListPage() {
     return () => clearTimeout(t)
   }, [localSearch, searchParam, statusParam, navigate])
 
+  const hasFilters = statusParam !== 'all' || Boolean(searchParam)
   const apiStatus = statusParam === 'all' ? undefined : statusParam
   const limit = 50
   const list = usePosList({
@@ -117,13 +120,28 @@ export function PosListPage() {
         </Alert>
       )}
 
-      {list.isLoading && <Text c="dimmed">Loading…</Text>}
+      {list.isLoading && <LoadingSkeleton rows={5} />}
 
-      {list.isSuccess && items.length === 0 && (
+      {list.isSuccess && items.length === 0 && !hasFilters && (
+        <EmptyState
+          title="No purchase orders yet"
+          body="Create your first PO to start receiving inventory."
+          actions={[
+            { label: 'New purchase order', href: '/purchase-orders/new', primary: true },
+          ]}
+          agentPrompt="Draft a PO for top supplier?"
+        />
+      )}
+
+      {list.isSuccess && items.length === 0 && hasFilters && (
         <Box ta="center" py="xl">
           <Text c="dimmed">No purchase orders match these filters.</Text>
-          <Button mt="md" component={Link} to="/purchase-orders/new" leftSection={<IconPlus size={14} />}>
-            Create your first PO
+          <Button
+            mt="md"
+            variant="subtle"
+            onClick={() => void navigate({ to: '/purchase-orders', search: {} })}
+          >
+            Clear filters
           </Button>
         </Box>
       )}

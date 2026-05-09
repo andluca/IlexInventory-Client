@@ -26,6 +26,7 @@ import { http, HttpResponse } from 'msw'
 import { server } from '@/test/server'
 import { mantineTheme } from '@/theme/mantine'
 import { BatchDetailPage } from '../BatchDetailPage'
+import { csvExportUrl } from '@/utils/csv-export'
 
 const BATCH_ACTIVE = {
   id: 'batch-1',
@@ -207,6 +208,34 @@ describe('BatchDetailPage', () => {
     expect(screen.getByRole('button', { name: /write off/i })).toBeDisabled()
   })
 
+  it('movements audit CSV button: href matches csvExportUrl for /movements?batch_id=batch-1', async () => {
+    server.use(
+      http.get('http://localhost:8000/api/v1/batches/batch-1', () =>
+        HttpResponse.json(BATCH_ACTIVE),
+      ),
+      http.get('http://localhost:8000/api/v1/products/prod-1', () =>
+        HttpResponse.json(PRODUCT_1),
+      ),
+      http.get('http://localhost:8000/api/v1/products', () =>
+        HttpResponse.json({ items: [PRODUCT_1], total: 1, limit: 200, offset: 0 }),
+      ),
+      http.get('http://localhost:8000/api/v1/movements', () =>
+        HttpResponse.json(EMPTY_MOVEMENTS),
+      ),
+    )
+
+    const router = await makeRouter('batch-1')
+    await renderWithRouter(router)
+
+    await waitFor(() => {
+      expect(screen.getByText('Yerba Premium')).toBeInTheDocument()
+    })
+
+    const expectedHref = csvExportUrl('/movements', { batch_id: 'batch-1' })
+    const auditCsvLink = screen.getByRole('link', { name: /download audit csv/i })
+    expect(auditCsvLink).toHaveAttribute('href', expectedHref)
+  })
+
   it('metadata_correction row appears in audit timeline after F12 save (surface-listed)', async () => {
     let movementCallCount = 0
 
@@ -257,5 +286,114 @@ describe('BatchDetailPage', () => {
     await waitFor(() => {
       expect(screen.getByText('metadata_correction')).toBeInTheDocument()
     })
+  })
+
+  // ---------------------------------------------------------------------------
+  // ILE-10 Step 1: "View recall report" link in action bar
+  // ---------------------------------------------------------------------------
+
+  it('action bar contains "View recall report" link pointing to /batches/:id/recall-report', async () => {
+    server.use(
+      http.get('http://localhost:8000/api/v1/batches/batch-1', () =>
+        HttpResponse.json(BATCH_ACTIVE),
+      ),
+      http.get('http://localhost:8000/api/v1/products/prod-1', () =>
+        HttpResponse.json(PRODUCT_1),
+      ),
+      http.get('http://localhost:8000/api/v1/products', () =>
+        HttpResponse.json({ items: [PRODUCT_1], total: 1, limit: 200, offset: 0 }),
+      ),
+      http.get('http://localhost:8000/api/v1/movements', () =>
+        HttpResponse.json(EMPTY_MOVEMENTS),
+      ),
+    )
+
+    const router = await makeRouter('batch-1')
+    await renderWithRouter(router)
+
+    await waitFor(() => {
+      expect(screen.getByText('Yerba Premium')).toBeInTheDocument()
+    })
+
+    const link = screen.getByRole('link', { name: /view recall report/i })
+    expect(link).toHaveAttribute('href', '/batches/batch-1/recall-report')
+  })
+
+  // ---------------------------------------------------------------------------
+  // ILE-9 Step 8: Act modal bus wiring
+  // ---------------------------------------------------------------------------
+
+  it('act-bus recall request opens RecallModal', async () => {
+    const { useActModalBus } = await import('@/stores/act-modal-bus')
+    useActModalBus.setState({ request: null })
+
+    server.use(
+      http.get('http://localhost:8000/api/v1/batches/batch-1', () =>
+        HttpResponse.json(BATCH_ACTIVE),
+      ),
+      http.get('http://localhost:8000/api/v1/products/prod-1', () =>
+        HttpResponse.json(PRODUCT_1),
+      ),
+      http.get('http://localhost:8000/api/v1/products', () =>
+        HttpResponse.json({ items: [PRODUCT_1], total: 1, limit: 200, offset: 0 }),
+      ),
+      http.get('http://localhost:8000/api/v1/movements', () =>
+        HttpResponse.json(EMPTY_MOVEMENTS),
+      ),
+    )
+
+    const router = await makeRouter('batch-1')
+    await renderWithRouter(router)
+
+    await waitFor(() => {
+      expect(screen.getByText('Yerba Premium')).toBeInTheDocument()
+    })
+
+    // Fire the bus request — should open the RecallModal
+    useActModalBus.setState({ request: { kind: 'recall', batchId: 'batch-1' } })
+
+    await waitFor(() => {
+      // RecallModal should be open — look for a modal dialog with recall-related content
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
+    })
+
+    // After opening, the bus should be cleared
+    expect(useActModalBus.getState().request).toBeNull()
+  })
+
+  it('act-bus unrecall request opens UnRecallModal', async () => {
+    const { useActModalBus } = await import('@/stores/act-modal-bus')
+    useActModalBus.setState({ request: null })
+
+    server.use(
+      http.get('http://localhost:8000/api/v1/batches/batch-1', () =>
+        HttpResponse.json(BATCH_RECALLED),
+      ),
+      http.get('http://localhost:8000/api/v1/products/prod-1', () =>
+        HttpResponse.json(PRODUCT_1),
+      ),
+      http.get('http://localhost:8000/api/v1/products', () =>
+        HttpResponse.json({ items: [PRODUCT_1], total: 1, limit: 200, offset: 0 }),
+      ),
+      http.get('http://localhost:8000/api/v1/movements', () =>
+        HttpResponse.json(EMPTY_MOVEMENTS),
+      ),
+    )
+
+    const router = await makeRouter('batch-1')
+    await renderWithRouter(router)
+
+    await waitFor(() => {
+      expect(screen.getByText(/Listeria detected/)).toBeInTheDocument()
+    })
+
+    // Fire the bus request — should open the UnRecallModal
+    useActModalBus.setState({ request: { kind: 'unrecall', batchId: 'batch-1' } })
+
+    await waitFor(() => {
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
+    })
+
+    expect(useActModalBus.getState().request).toBeNull()
   })
 })

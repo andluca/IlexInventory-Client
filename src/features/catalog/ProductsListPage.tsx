@@ -23,6 +23,7 @@ import {
 } from '@mantine/core'
 import { useProductsList } from '@/data/catalog/queries'
 import { ApiError } from '@/api/errors'
+import { EmptyState } from '@/components/EmptyState'
 import { NewProductModal } from './NewProductModal'
 import { ImportCsvModal } from './ImportCsvModal'
 
@@ -182,15 +183,15 @@ export function ProductsListPage() {
 
         {/* Empty states */}
         {!isError && total === 0 && !hasFilters && (
-          <Stack align="center" py="xl" gap="md">
-            <Text c="dimmed">No products yet. Create one or import from CSV.</Text>
-            <Group>
-              <Button onClick={() => setNewProductOpened(true)}>New product</Button>
-              <Button variant="default" onClick={() => setImportCsvOpened(true)}>
-                Import CSV
-              </Button>
-            </Group>
-          </Stack>
+          <EmptyState
+            title="No products yet"
+            body="Create your first product or import from CSV."
+            actions={[
+              { label: 'New product', onClick: () => setNewProductOpened(true), primary: true },
+              { label: 'Import CSV', onClick: () => setImportCsvOpened(true) },
+            ]}
+            agentPrompt="Want me to import from CSV?"
+          />
         )}
 
         {!isError && total === 0 && hasFilters && (

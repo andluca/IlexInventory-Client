@@ -30,6 +30,7 @@ import { useSo } from '@/data/sales/queries'
 import { usePreviewSo } from '@/data/sales/queries'
 import { useCreateSo, useUpdateSo } from '@/data/sales/mutations'
 import { ApiError } from '@/api/errors'
+import { useActModalBus } from '@/stores/act-modal-bus'
 import { SoLineEditor, type DraftSoLine } from './SoLineEditor'
 import { FefoPreview } from './FefoPreview'
 import { CommitConfirmModal } from './CommitConfirmModal'
@@ -93,6 +94,16 @@ export function SoDraftPage({ soId }: SoDraftPageProps) {
     form.resetDirty()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [existing.data, isEdit, soId])
+
+  // Act modal bus — opened from CmdkPalette (ILE-9 Step 8)
+  const busRequest = useActModalBus((s) => s.request)
+  const clearBus = useActModalBus((s) => s.clear)
+  useEffect(() => {
+    if (busRequest?.kind === 'commit') {
+      setCommitOpen(true)
+      clearBus()
+    }
+  }, [busRequest, clearBus])
 
   // Debounce preview refresh on form changes
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)

@@ -1,10 +1,13 @@
 import { useEffect, type ReactNode } from 'react'
 import { Box } from '@mantine/core'
 import { useFloorMode } from '@/stores/floor-mode'
+import { useManualBatchModal } from '@/stores/manual-batch-modal'
 import { applyFloorClass } from './floorMode'
 import { Sidebar } from './Sidebar'
 import { Topbar } from './Topbar'
 import { RightRailSlot } from './RightRailSlot'
+import { CmdkPalette } from './CmdkPalette'
+import { ManualBatchModal } from '@/features/inventory/ManualBatchModal'
 
 /**
  * AppShell — wraps every authenticated page (per SPEC §2.8).
@@ -24,6 +27,8 @@ import { RightRailSlot } from './RightRailSlot'
  */
 export function AppShell({ children }: { children: ReactNode }) {
   const enabled = useFloorMode((s) => s.enabled)
+  const manualBatchOpen = useManualBatchModal((s) => s.open)
+  const setManualBatchOpen = useManualBatchModal((s) => s.setOpen)
 
   useEffect(() => {
     applyFloorClass(enabled)
@@ -39,6 +44,13 @@ export function AppShell({ children }: { children: ReactNode }) {
         </Box>
       </Box>
       <RightRailSlot />
+      {/* CmdkPalette mounts once — keyboard shortcut "mod+K" handled by Spotlight */}
+      <CmdkPalette />
+      {/* ManualBatchModal bound to useManualBatchModal store — opened from palette or BatchDetailPage */}
+      <ManualBatchModal
+        opened={manualBatchOpen}
+        onClose={() => setManualBatchOpen(false)}
+      />
     </Box>
   )
 }

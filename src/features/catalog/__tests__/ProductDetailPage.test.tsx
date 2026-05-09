@@ -342,4 +342,41 @@ describe('ProductDetailPage - movement audit subview', () => {
       expect(capturedProductId).toBe('prod-1')
     })
   })
+
+  // ---------------------------------------------------------------------------
+  // ILE-9 Step 8: Act modal bus wiring
+  // ---------------------------------------------------------------------------
+
+  it('act-bus archive request opens ArchiveConfirmModal', async () => {
+    const { useActModalBus } = await import('@/stores/act-modal-bus')
+    useActModalBus.setState({ request: null })
+
+    server.use(
+      http.get('http://localhost:8000/api/v1/products/prod-1', () =>
+        HttpResponse.json(PRODUCT_1),
+      ),
+      http.get('http://localhost:8000/api/v1/batches', () =>
+        HttpResponse.json({ items: [], total: 0, limit: 1, offset: 0 }),
+      ),
+      http.get('http://localhost:8000/api/v1/movements', () =>
+        HttpResponse.json({ items: [], next_cursor: null }),
+      ),
+    )
+
+    const router = await makeRouter('prod-1')
+    await renderWithRouter(router)
+
+    await waitFor(() => {
+      expect(screen.getByText('Yerba Premium')).toBeInTheDocument()
+    })
+
+    // Fire the bus request
+    useActModalBus.setState({ request: { kind: 'archive', productId: 'prod-1' } })
+
+    await waitFor(() => {
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
+    })
+
+    expect(useActModalBus.getState().request).toBeNull()
+  })
 })

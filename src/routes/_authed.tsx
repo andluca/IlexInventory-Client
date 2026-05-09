@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 import { RequireAuth } from '@/features/shell/RequireAuth'
 import { AppShell } from '@/features/shell/AppShell'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 /**
  * _authed — pathless layout route.
@@ -16,7 +17,9 @@ function AuthedLayout() {
   return (
     <RequireAuth>
       <AppShell>
-        <Outlet />
+        <ErrorBoundary>
+          <Outlet />
+        </ErrorBoundary>
       </AppShell>
     </RequireAuth>
   )

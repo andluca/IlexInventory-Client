@@ -9,7 +9,7 @@
  */
 
 import { useState, useEffect } from 'react'
-import { useNavigate, useSearch, Link } from '@tanstack/react-router'
+import { useNavigate, useSearch } from '@tanstack/react-router'
 import {
   Title,
   Group,
@@ -28,6 +28,8 @@ import { IconPlus } from '@tabler/icons-react'
 import { useBatchesList } from '@/data/inventory/queries'
 import { useProductsList } from '@/data/catalog/queries'
 import { ApiError } from '@/api/errors'
+import { LoadingSkeleton } from '@/components/LoadingSkeleton'
+import { EmptyState } from '@/components/EmptyState'
 import { ManualBatchModal } from './ManualBatchModal'
 
 type RecallFilter = 'all' | 'active' | 'recalled'
@@ -176,20 +178,17 @@ export function StockByBatchPage() {
         </Alert>
       )}
 
-      {batchList.isLoading && <Text c="dimmed">Loading…</Text>}
+      {batchList.isLoading && <LoadingSkeleton rows={5} />}
 
       {batchList.isSuccess && items.length === 0 && !hasFilters && (
-        <Box ta="center" py="xl">
-          <Text c="dimmed">No batches yet. Receive a PO or create a batch manually.</Text>
-          <Group justify="center" mt="md" gap="sm">
-            <Button leftSection={<IconPlus size={14} />} onClick={() => setManualBatchOpen(true)}>
-              New batch
-            </Button>
-            <Button variant="subtle" component={Link} to="/purchase-orders/new">
-              New PO
-            </Button>
-          </Group>
-        </Box>
+        <EmptyState
+          title="No batches yet"
+          body="Receive a PO or create a batch manually to see stock here."
+          actions={[
+            { label: 'New batch', onClick: () => setManualBatchOpen(true), primary: true },
+            { label: 'New PO', href: '/purchase-orders/new' },
+          ]}
+        />
       )}
 
       {batchList.isSuccess && items.length === 0 && hasFilters && (

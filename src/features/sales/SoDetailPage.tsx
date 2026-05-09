@@ -6,7 +6,7 @@
  * Shows committed/voided SO with lines table, allocations table, and Void affordance.
  */
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import {
   Alert,
@@ -24,6 +24,8 @@ import { IconArrowLeft } from '@tabler/icons-react'
 import { notifications } from '@mantine/notifications'
 import { useSo } from '@/data/sales/queries'
 import { ApiError } from '@/api/errors'
+import { useActModalBus } from '@/stores/act-modal-bus'
+import { LoadingSkeleton } from '@/components/LoadingSkeleton'
 import { AllocationsTable } from './AllocationsTable'
 import { VoidConfirmModal } from './VoidConfirmModal'
 import { formatMoney } from '@/utils/money'
@@ -60,10 +62,25 @@ export function SoDetailPage({ soId }: { soId: string }) {
     }
   }, [so.data?.status, soId, navigate])
 
+  // Act modal bus — opened from CmdkPalette (ILE-9 Step 8)
+  const busRequest = useActModalBus((s) => s.request)
+  const clearBus = useActModalBus((s) => s.clear)
+  const prevBusRef = useRef(busRequest)
+
+  useEffect(() => {
+    if (busRequest !== prevBusRef.current) {
+      prevBusRef.current = busRequest
+    }
+    if (busRequest?.kind === 'void' && busRequest.soId === soId) {
+      setVoidOpen(true)
+      clearBus()
+    }
+  }, [busRequest, soId, clearBus])
+
   if (so.isLoading) {
     return (
       <Stack p="xl">
-        <Text c="dimmed">Loading…</Text>
+        <LoadingSkeleton rows={5} />
       </Stack>
     )
   }

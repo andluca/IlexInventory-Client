@@ -1,23 +1,27 @@
-import { useState } from 'react'
-import { Stack, Text, TextInput, ActionIcon, Group, Box } from '@mantine/core'
-import { IconMessageCircle, IconChevronRight } from '@tabler/icons-react'
-
 /**
  * RightRailSlot — collapsible right-rail container, 320px wide.
  *
  * v1 ships an empty placeholder body. ILE-13 (Phase 3) fills it with <AgentPanel>.
- * Local useState for collapsed flag (no cross-component coupling in v1; promote
- * to a store if ILE-13 needs it from outside).
+ * Replaces local useState with useAgentPanel store so CmdkPalette can force-expand
+ * and prefill the query from any route (ILE-9).
  *
  * Per docs/design/components.md#rightrailslot.
  */
-export function RightRailSlot() {
-  const [collapsed, setCollapsed] = useState(false)
 
-  if (collapsed) {
+import { Stack, Text, TextInput, ActionIcon, Group, Box } from '@mantine/core'
+import { IconMessageCircle, IconChevronRight } from '@tabler/icons-react'
+import { useAgentPanel } from '@/stores/agent-panel'
+
+export function RightRailSlot() {
+  const open = useAgentPanel((s) => s.open)
+  const prefilledQuery = useAgentPanel((s) => s.prefilledQuery)
+  const setOpen = useAgentPanel((s) => s.setOpen)
+
+  if (!open) {
     return (
       <Box
         component="aside"
+        data-testid="agent-panel"
         w={36}
         h="100vh"
         style={{
@@ -29,7 +33,7 @@ export function RightRailSlot() {
       >
         <ActionIcon
           variant="subtle"
-          onClick={() => setCollapsed(false)}
+          onClick={() => setOpen(true)}
           mt="sm"
           ml="xs"
           aria-label="Expand Ask Ilex panel"
@@ -43,6 +47,7 @@ export function RightRailSlot() {
   return (
     <Box
       component="aside"
+      data-testid="agent-panel"
       w={320}
       h="100vh"
       style={{
@@ -62,7 +67,7 @@ export function RightRailSlot() {
         <ActionIcon
           variant="subtle"
           size="sm"
-          onClick={() => setCollapsed(true)}
+          onClick={() => setOpen(false)}
           aria-label="Collapse Ask Ilex panel"
         >
           <IconChevronRight size={14} style={{ transform: 'rotate(180deg)' }} />
@@ -81,6 +86,10 @@ export function RightRailSlot() {
           placeholder="Ask anything about your inventory…"
           disabled
           aria-label="Ask Ilex (coming soon)"
+          value={prefilledQuery}
+          onChange={() => {
+            /* disabled — read-only in v1; value populated by useAgentPanel store */
+          }}
         />
       </Box>
     </Box>
