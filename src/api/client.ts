@@ -50,9 +50,9 @@ const ALWAYS_IDEMPOTENT_POST_PATHS = new Set([
   '/api/v1/batches',
   '/api/v1/batches/{batch_id}/recall',
   '/api/v1/batches/{batch_id}/un-recall',
-  // Sales endpoints — added when schema snapshot includes them:
-  '/api/v1/sales-orders/{sales_order_id}/commit',
-  '/api/v1/sales-orders/{sales_order_id}/void',
+  // Sales endpoints — schema path param is `so_id`:
+  '/api/v1/sales-orders/{so_id}/commit',
+  '/api/v1/sales-orders/{so_id}/void',
 ])
 
 /** Paths that get an Idempotency-Key only when the body matches a condition. */

@@ -22,9 +22,9 @@ import { inventoryKeys } from '@/data/inventory/keys'
 import type { components } from '@/api/generated/schema'
 
 export type PurchaseOrderResponse = components['schemas']['PurchaseOrderResponse']
-export type PurchaseOrderCreateRequest = components['schemas']['PurchaseOrderCreateRequest']
-export type LineCreateRequest = components['schemas']['LineCreateRequest']
-export type ReceiveLineRequest = components['schemas']['ReceiveLineRequest']
+export type PurchaseOrderCreateRequest = components['schemas']['PurchaseOrderCreateRequestRequest']
+export type LineCreateRequest = components['schemas']['LineCreateRequestRequest']
+export type ReceiveLineRequest = components['schemas']['ReceiveLineRequestRequest']
 
 // ---------------------------------------------------------------------------
 // useCreatePo
@@ -61,7 +61,7 @@ export function useUpdatePo(): UseMutationResult<PurchaseOrderResponse, ApiError
 
   return useMutation<PurchaseOrderResponse, ApiError, UpdatePoVars>({
     mutationFn: async ({ id, supplier_name, supplier_contact, lines }) => {
-      const body: components['schemas']['PatchedPurchaseOrderUpdateRequest'] = {}
+      const body: components['schemas']['PatchedPurchaseOrderUpdateRequestRequest'] = {}
       if (supplier_name !== undefined) body.supplier_name = supplier_name
       if (supplier_contact !== undefined) body.supplier_contact = supplier_contact
       if (lines !== undefined) body.lines = lines

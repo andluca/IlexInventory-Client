@@ -56,7 +56,15 @@ export function useProductsList(
 // useProduct
 // ---------------------------------------------------------------------------
 
-export function useProduct(id: string): UseQueryResult<ProductResponse, ApiError> {
+export interface UseProductOptions {
+  enabled?: boolean
+}
+
+export function useProduct(
+  id: string,
+  options: UseProductOptions = {},
+): UseQueryResult<ProductResponse, ApiError> {
+  const { enabled = true } = options
   return useQuery<ProductResponse, ApiError>({
     queryKey: catalogKeys.detail(id),
     queryFn: async () => {
@@ -65,6 +73,7 @@ export function useProduct(id: string): UseQueryResult<ProductResponse, ApiError
       })
       return data as ProductResponse
     },
+    enabled,
     staleTime: 30_000,
     retry: (failureCount, error) => {
       // Don't retry on 404 — masked cross-owner case per BE-D4

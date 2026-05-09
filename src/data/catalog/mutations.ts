@@ -16,7 +16,7 @@ import { ApiError } from '@/api/errors'
 import { catalogKeys } from './keys'
 import type { components } from '@/api/generated/schema'
 
-export type ProductCreateRequest = components['schemas']['ProductCreateRequest']
+export type ProductCreateRequest = components['schemas']['ProductCreateRequestRequest']
 export type ProductResponse = components['schemas']['ProductResponse']
 export type ProductImportResponse = components['schemas']['ProductImportResponse']
 export type FailedRowResponse = components['schemas']['FailedRowResponse']

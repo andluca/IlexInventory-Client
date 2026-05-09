@@ -101,10 +101,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description GET /batches — list batches for the authenticated owner. */
+        /**
+         * List batches
+         * @description GET /batches — list batches for the authenticated owner.
+         */
         get: operations["batches_retrieve"];
         put?: never;
-        /** @description POST /batches — create a manual batch (idempotency-keyed). */
+        /**
+         * Create a manual batch
+         * @description POST /batches — create a manual batch (idempotency-keyed).
+         */
         post: operations["batches_create"];
         delete?: never;
         options?: never;
@@ -119,14 +125,20 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description GET /batches/{id} — return batch with on_hand + recall state. */
+        /**
+         * Get batch by ID
+         * @description GET /batches/{id} — return batch with on_hand + recall state.
+         */
         get: operations["batches_retrieve_2"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
-        /** @description PATCH /batches/{id} — update batch_code and/or expiration_date. */
+        /**
+         * Update batch metadata
+         * @description PATCH /batches/{id} — update batch_code and/or expiration_date.
+         */
         patch: operations["batches_partial_update"];
         trace?: never;
     };
@@ -139,7 +151,17 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description POST /batches/{id}/movements — record a movement (adjustment or write_off). */
+        /**
+         * Record a stock movement
+         * @description POST /batches/{id}/movements — record an adjustment or write-off.
+         *
+         *     SPEC §2.6 mandates `Idempotency-Key` for write_off (a stock-debiting
+         *     operation that is destructive on retry). Adjustment is a free-form audit
+         *     correction and does not require the header. The view dispatches by `kind`:
+         *     write_off goes through the `@idempotent`-decorated path, adjustment runs
+         *     directly. Pre-ILEX-016, neither was decorated and a retried write_off
+         *     could double-debit stock.
+         */
         post: operations["batches_movements_create"];
         delete?: never;
         options?: never;
@@ -156,8 +178,31 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description POST /batches/{id}/recall. */
+        /**
+         * Recall a batch
+         * @description POST /batches/{id}/recall.
+         */
         post: operations["batches_recall_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/batches/{batch_id}/recall-report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Recall report for a batch (JSON or CSV export)
+         * @description GET /batches/{id}/recall-report — recall report for a batch (JSON or CSV).
+         */
+        get: operations["batches_recall_report_retrieve"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -173,8 +218,51 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description POST /batches/{id}/un-recall. */
+        /**
+         * Un-recall a batch
+         * @description POST /batches/{id}/un-recall.
+         */
         post: operations["batches_un_recall_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/financials/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Financial dashboard totals (JSON or CSV export)
+         * @description GET /financials/dashboard — aggregated dashboard or CSV of top_products.
+         */
+        get: operations["financials_dashboard_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/financials/margin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Per-product margin list (JSON or CSV export)
+         * @description GET /financials/margin — paginated per-product margin rows or CSV export.
+         */
+        get: operations["financials_margin_retrieve"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -189,6 +277,7 @@ export interface paths {
             cookie?: never;
         };
         /**
+         * Liveness probe with Postgres reachability check
          * @description Liveness probe with Postgres reachability check.
          *
          *     Anonymous — no auth, no CSRF (GET only).
@@ -209,7 +298,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description GET /movements — paginated audit log. */
+        /**
+         * List stock movements (JSON or CSV export)
+         * @description GET /movements — paginated audit log or CSV streaming export.
+         */
         get: operations["movements_retrieve"];
         put?: never;
         post?: never;
@@ -387,18 +479,137 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/sales-orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List sales orders
+         * @description GET /sales-orders — list sales orders for the authenticated owner.
+         */
+        get: operations["sales_orders_retrieve"];
+        put?: never;
+        /**
+         * Create a draft sales order
+         * @description POST /sales-orders — create a draft sales order.
+         */
+        post: operations["sales_orders_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sales-orders/{so_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get sales order by ID
+         * @description GET /sales-orders/{id} — return SO with lines + allocations.
+         */
+        get: operations["sales_orders_retrieve_2"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete a draft sales order
+         * @description DELETE /sales-orders/{id} — hard-delete a draft SO.
+         */
+        delete: operations["sales_orders_destroy"];
+        options?: never;
+        head?: never;
+        /**
+         * Update a draft sales order
+         * @description PATCH /sales-orders/{id} — update a draft SO.
+         */
+        patch: operations["sales_orders_partial_update"];
+        trace?: never;
+    };
+    "/api/v1/sales-orders/{so_id}/commit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Commit a draft sales order
+         * @description POST /sales-orders/{id}/commit — commit a draft SO.
+         */
+        post: operations["sales_orders_commit_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sales-orders/{so_id}/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Preview FEFO allocations for a sales order
+         * @description POST /sales-orders/{id}/preview — return proposed FEFO allocations.
+         */
+        post: operations["sales_orders_preview_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sales-orders/{so_id}/void": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Void a committed sales order
+         * @description POST /sales-orders/{id}/void — void a committed SO.
+         */
+        post: operations["sales_orders_void_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        /**
-         * @description * `g` - g
-         *     * `ml` - ml
-         *     * `unit` - unit
-         * @enum {string}
-         */
-        BaseUnitEnum: "g" | "ml" | "unit";
-        BatchCreateRequest: {
+        AllocationResponse: {
+            /** Format: uuid */
+            readonly id: string;
+            /** Format: uuid */
+            readonly sales_order_line_id: string;
+            /** Format: uuid */
+            readonly batch_id: string;
+            /** Format: decimal */
+            readonly allocated_quantity: string;
+            /** Format: decimal */
+            readonly unit_cost: string;
+            /** Format: date-time */
+            readonly created_at: string;
+        };
+        BatchCreateRequestRequest: {
             /** Format: uuid */
             product_id: string;
             batch_code: string;
@@ -441,6 +652,32 @@ export interface components {
             /** Format: date-time */
             readonly updated_at: string;
         };
+        DashboardResponse: {
+            /** Format: date */
+            readonly date_from: string;
+            /** Format: date */
+            readonly date_to: string;
+            readonly totals: components["schemas"]["DashboardTotalsResponse"];
+            readonly top_products: components["schemas"]["MarginRowResponse"][];
+        };
+        DashboardTotalsResponse: {
+            /** Format: decimal */
+            readonly revenue: string;
+            /** Format: decimal */
+            readonly cogs: string;
+            /** Format: decimal */
+            readonly profit: string;
+            /** Format: decimal */
+            readonly margin_pct: string | null;
+        };
+        ExplicitAllocationRequestRequest: {
+            /** Format: uuid */
+            line_id: string;
+            /** Format: uuid */
+            batch_id: string;
+            /** Format: double */
+            quantity: number;
+        };
         FailedRowResponse: {
             readonly row_index: number;
             readonly error: string;
@@ -460,13 +697,7 @@ export interface components {
             checks: components["schemas"]["HealthChecks"];
             status: string;
         };
-        /**
-         * @description * `adjustment` - adjustment
-         *     * `write_off` - write_off
-         * @enum {string}
-         */
-        KindEnum: "adjustment" | "write_off";
-        LineCreateRequest: {
+        LineCreateRequestRequest: {
             /** Format: uuid */
             product_id: string;
             /** Format: double */
@@ -474,12 +705,37 @@ export interface components {
             /** Format: double */
             unit_cost: number;
         };
-        MovementCreateRequest: {
-            kind: components["schemas"]["KindEnum"];
+        MarginListResponse: {
+            readonly items: components["schemas"]["MarginRowResponse"][];
+            readonly next_cursor: string | null;
+        };
+        MarginRowResponse: {
+            /** Format: uuid */
+            readonly product_id: string;
+            readonly product_name: string;
+            /** Format: decimal */
+            readonly units_sold: string;
+            /** Format: decimal */
+            readonly revenue: string;
+            /** Format: decimal */
+            readonly cogs: string;
+            /** Format: decimal */
+            readonly profit: string;
+            /** Format: decimal */
+            readonly margin_pct: string | null;
+        };
+        MovementCreateRequestRequest: {
+            kind: components["schemas"]["MovementKind"];
             /** Format: double */
             signed_quantity: number;
             notes?: string | null;
         };
+        /**
+         * @description * `adjustment` - adjustment
+         *     * `write_off` - write_off
+         * @enum {string}
+         */
+        MovementKind: "adjustment" | "write_off";
         MovementListResponse: {
             readonly items: components["schemas"]["MovementResponse"][];
             readonly next_cursor: string | null;
@@ -500,7 +756,7 @@ export interface components {
             /** Format: date-time */
             readonly created_at: string;
         };
-        PatchedBatchPatchMetadataRequest: {
+        PatchedBatchPatchMetadataRequestRequest: {
             batch_code?: string;
             /** Format: date */
             expiration_date?: string | null;
@@ -513,21 +769,33 @@ export interface components {
          *     Any other key (including `sku`) is rejected: DRF strict-mode via
          *     validate() to keep the serializer layer clean of SKU-lock business logic.
          */
-        PatchedProductUpdateRequest: {
+        PatchedProductUpdateRequestRequest: {
             name?: string;
             description?: string;
         };
-        PatchedPurchaseOrderUpdateRequest: {
+        PatchedPurchaseOrderUpdateRequestRequest: {
             supplier_name?: string;
             supplier_contact?: string | null;
-            lines?: components["schemas"]["LineCreateRequest"][];
+            lines?: components["schemas"]["LineCreateRequestRequest"][];
         };
-        ProductCreateRequest: {
+        PatchedSalesOrderUpdateRequestRequest: {
+            customer_name?: string;
+            customer_contact?: string | null;
+            lines?: components["schemas"]["SalesOrderLineRequestRequest"][];
+        };
+        /**
+         * @description * `g` - g
+         *     * `ml` - ml
+         *     * `unit` - unit
+         * @enum {string}
+         */
+        ProductBaseUnit: "g" | "ml" | "unit";
+        ProductCreateRequestRequest: {
             sku: string;
             name: string;
             /** @default  */
             description: string;
-            base_unit: components["schemas"]["BaseUnitEnum"];
+            base_unit: components["schemas"]["ProductBaseUnit"];
         };
         ProductImportResponse: {
             readonly imported: number;
@@ -553,10 +821,23 @@ export interface components {
             /** Format: date-time */
             readonly updated_at: string;
         };
-        PurchaseOrderCreateRequest: {
+        ProposedAllocationResponse: {
+            /** Format: uuid */
+            readonly line_id: string;
+            /** Format: uuid */
+            readonly batch_id: string;
+            readonly batch_code: string;
+            /** Format: decimal */
+            readonly quantity: string;
+            /** Format: decimal */
+            readonly unit_cost: string;
+            /** Format: date */
+            readonly expiration_date: string | null;
+        };
+        PurchaseOrderCreateRequestRequest: {
             supplier_name: string;
             supplier_contact?: string | null;
-            lines: components["schemas"]["LineCreateRequest"][];
+            lines: components["schemas"]["LineCreateRequestRequest"][];
         };
         PurchaseOrderLineResponse: {
             /** Format: uuid */
@@ -578,8 +859,8 @@ export interface components {
             readonly limit: number;
             readonly offset: number;
         };
-        PurchaseOrderReceiveRequest: {
-            lines: components["schemas"]["ReceiveLineRequest"][];
+        PurchaseOrderReceiveRequestRequest: {
+            lines: components["schemas"]["ReceiveLineRequestRequest"][];
         };
         PurchaseOrderResponse: {
             /** Format: uuid */
@@ -595,15 +876,96 @@ export interface components {
             readonly updated_at: string;
             readonly lines: components["schemas"]["PurchaseOrderLineResponse"][];
         };
-        RecallRequest: {
+        RecallReportItemResponse: {
+            /** Format: uuid */
+            readonly sale_order_id: string;
+            readonly customer_name: string;
+            readonly customer_contact: string | null;
+            /** Format: decimal */
+            readonly quantity_received: string;
+            /** Format: date-time */
+            readonly sale_committed_at: string;
+        };
+        RecallReportResponse: {
+            readonly items: components["schemas"]["RecallReportItemResponse"][];
+            readonly total: number;
+            readonly limit: number;
+            readonly offset: number;
+        };
+        RecallRequestRequest: {
             reason: string;
         };
-        ReceiveLineRequest: {
+        ReceiveLineRequestRequest: {
             /** Format: uuid */
             line_id: string;
             batch_code: string;
             /** Format: date */
             expiration_date?: string | null;
+        };
+        SalesOrderCommitRequestRequest: {
+            allocations?: components["schemas"]["ExplicitAllocationRequestRequest"][] | null;
+        };
+        SalesOrderCreateRequestRequest: {
+            customer_name: string;
+            customer_contact?: string | null;
+            lines: components["schemas"]["SalesOrderLineRequestRequest"][];
+        };
+        SalesOrderLineRequestRequest: {
+            /** Format: uuid */
+            product_id: string;
+            /** Format: double */
+            quantity: number;
+            /** Format: double */
+            sell_price: number;
+        };
+        SalesOrderLineResponse: {
+            /** Format: uuid */
+            readonly id: string;
+            /** Format: uuid */
+            readonly sales_order_id: string;
+            /** Format: uuid */
+            readonly product_id: string;
+            /** Format: decimal */
+            readonly quantity: string;
+            /** Format: decimal */
+            readonly sell_price: string;
+            /** Format: date-time */
+            readonly created_at: string;
+        };
+        SalesOrderListResponse: {
+            readonly items: components["schemas"]["SalesOrderResponse"][];
+            readonly next_cursor: string | null;
+        };
+        SalesOrderPreviewResponse: {
+            readonly allocations: components["schemas"]["ProposedAllocationResponse"][];
+        };
+        SalesOrderResponse: {
+            /** Format: uuid */
+            readonly id: string;
+            readonly owner_id: number;
+            readonly customer_name: string;
+            readonly customer_contact: string | null;
+            readonly status: string;
+            /** Format: date-time */
+            readonly committed_at: string | null;
+            /** Format: date-time */
+            readonly voided_at: string | null;
+            /** Format: date-time */
+            readonly created_at: string;
+            /** Format: date-time */
+            readonly updated_at: string;
+            readonly lines: components["schemas"]["SalesOrderLineResponse"][];
+            readonly allocations: components["schemas"]["AllocationResponse"][];
+        };
+        ErrorResponse: {
+            /** @description Machine-readable error code (e.g. 'ValidationError', 'NotFound'). */
+            error: string;
+            /** @description Human-readable explanation (optional). */
+            detail?: string;
+            /** @description Per-field validation errors keyed by field name (optional). */
+            fields?: {
+                [key: string]: unknown;
+            };
         };
     };
     responses: never;
@@ -725,9 +1087,9 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["BatchCreateRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["BatchCreateRequest"];
-                "multipart/form-data": components["schemas"]["BatchCreateRequest"];
+                "application/json": components["schemas"]["BatchCreateRequestRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["BatchCreateRequestRequest"];
+                "multipart/form-data": components["schemas"]["BatchCreateRequestRequest"];
             };
         };
         responses: {
@@ -773,9 +1135,9 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["PatchedBatchPatchMetadataRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["PatchedBatchPatchMetadataRequest"];
-                "multipart/form-data": components["schemas"]["PatchedBatchPatchMetadataRequest"];
+                "application/json": components["schemas"]["PatchedBatchPatchMetadataRequestRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedBatchPatchMetadataRequestRequest"];
+                "multipart/form-data": components["schemas"]["PatchedBatchPatchMetadataRequestRequest"];
             };
         };
         responses: {
@@ -800,9 +1162,9 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["MovementCreateRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["MovementCreateRequest"];
-                "multipart/form-data": components["schemas"]["MovementCreateRequest"];
+                "application/json": components["schemas"]["MovementCreateRequestRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["MovementCreateRequestRequest"];
+                "multipart/form-data": components["schemas"]["MovementCreateRequestRequest"];
             };
         };
         responses: {
@@ -827,9 +1189,9 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["RecallRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["RecallRequest"];
-                "multipart/form-data": components["schemas"]["RecallRequest"];
+                "application/json": components["schemas"]["RecallRequestRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["RecallRequestRequest"];
+                "multipart/form-data": components["schemas"]["RecallRequestRequest"];
             };
         };
         responses: {
@@ -839,6 +1201,34 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["BatchResponse"];
+                };
+            };
+        };
+    };
+    batches_recall_report_retrieve: {
+        parameters: {
+            query?: {
+                /** @description Set to 'csv' to receive a streaming CSV export instead of the default JSON response. The response Content-Type will be text/csv; charset=utf-8 with a Content-Disposition header. */
+                format?: "csv";
+                /** @description Page size (default 50) */
+                limit?: number;
+                /** @description Page offset (default 0) */
+                offset?: number;
+            };
+            header?: never;
+            path: {
+                batch_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecallReportResponse"];
                 };
             };
         };
@@ -860,6 +1250,64 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["BatchResponse"];
+                };
+            };
+        };
+    };
+    financials_dashboard_retrieve: {
+        parameters: {
+            query?: {
+                /** @description Set to 'csv' to receive a streaming CSV export instead of the default JSON response. The response Content-Type will be text/csv; charset=utf-8 with a Content-Disposition header. */
+                format?: "csv";
+                /** @description Date range start (YYYY-MM-DD) */
+                from?: string;
+                /** @description Date range end (YYYY-MM-DD) */
+                to?: string;
+                /** @description Top-N products (default 5, max 50) */
+                top?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DashboardResponse"];
+                };
+            };
+        };
+    };
+    financials_margin_retrieve: {
+        parameters: {
+            query?: {
+                /** @description Opaque cursor for next page */
+                cursor?: string;
+                /** @description Set to 'csv' to receive a streaming CSV export instead of the default JSON response. The response Content-Type will be text/csv; charset=utf-8 with a Content-Disposition header. */
+                format?: "csv";
+                /** @description Date range start (YYYY-MM-DD) */
+                from?: string;
+                /** @description Page size (default 50, max 100) */
+                limit?: number;
+                /** @description Date range end (YYYY-MM-DD) */
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MarginListResponse"];
                 };
             };
         };
@@ -898,6 +1346,8 @@ export interface operations {
                 batch_id?: string;
                 /** @description Opaque cursor for next page */
                 cursor?: string;
+                /** @description Set to 'csv' to receive a streaming CSV export instead of the default JSON response. The response Content-Type will be text/csv; charset=utf-8 with a Content-Disposition header. */
+                format?: "csv";
                 /** @description created_at >= date */
                 from?: string;
                 /** @description Exact kind filter */
@@ -962,9 +1412,9 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ProductCreateRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["ProductCreateRequest"];
-                "multipart/form-data": components["schemas"]["ProductCreateRequest"];
+                "application/json": components["schemas"]["ProductCreateRequestRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ProductCreateRequestRequest"];
+                "multipart/form-data": components["schemas"]["ProductCreateRequestRequest"];
             };
         };
         responses: {
@@ -1051,9 +1501,9 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["PatchedProductUpdateRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["PatchedProductUpdateRequest"];
-                "multipart/form-data": components["schemas"]["PatchedProductUpdateRequest"];
+                "application/json": components["schemas"]["PatchedProductUpdateRequestRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedProductUpdateRequestRequest"];
+                "multipart/form-data": components["schemas"]["PatchedProductUpdateRequestRequest"];
             };
         };
         responses: {
@@ -1183,9 +1633,9 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["PurchaseOrderCreateRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["PurchaseOrderCreateRequest"];
-                "multipart/form-data": components["schemas"]["PurchaseOrderCreateRequest"];
+                "application/json": components["schemas"]["PurchaseOrderCreateRequestRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PurchaseOrderCreateRequestRequest"];
+                "multipart/form-data": components["schemas"]["PurchaseOrderCreateRequestRequest"];
             };
         };
         responses: {
@@ -1286,9 +1736,9 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["PatchedPurchaseOrderUpdateRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["PatchedPurchaseOrderUpdateRequest"];
-                "multipart/form-data": components["schemas"]["PatchedPurchaseOrderUpdateRequest"];
+                "application/json": components["schemas"]["PatchedPurchaseOrderUpdateRequestRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedPurchaseOrderUpdateRequestRequest"];
+                "multipart/form-data": components["schemas"]["PatchedPurchaseOrderUpdateRequestRequest"];
             };
         };
         responses: {
@@ -1334,9 +1784,9 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["PurchaseOrderReceiveRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["PurchaseOrderReceiveRequest"];
-                "multipart/form-data": components["schemas"]["PurchaseOrderReceiveRequest"];
+                "application/json": components["schemas"]["PurchaseOrderReceiveRequestRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PurchaseOrderReceiveRequestRequest"];
+                "multipart/form-data": components["schemas"]["PurchaseOrderReceiveRequestRequest"];
             };
         };
         responses: {
@@ -1368,6 +1818,202 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    sales_orders_retrieve: {
+        parameters: {
+            query?: {
+                /** @description Opaque cursor for next page */
+                cursor?: string;
+                /** @description created_at >= date */
+                from?: string;
+                /** @description Page size (default 50) */
+                limit?: number;
+                /** @description ILIKE on customer_name */
+                search?: string;
+                /** @description Filter by status (draft|committed) */
+                status?: string;
+                /** @description created_at <= date */
+                to?: string;
+                /** @description Filter voided state */
+                voided?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SalesOrderListResponse"];
+                };
+            };
+        };
+    };
+    sales_orders_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SalesOrderCreateRequestRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["SalesOrderCreateRequestRequest"];
+                "multipart/form-data": components["schemas"]["SalesOrderCreateRequestRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SalesOrderResponse"];
+                };
+            };
+        };
+    };
+    sales_orders_retrieve_2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                so_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SalesOrderResponse"];
+                };
+            };
+        };
+    };
+    sales_orders_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                so_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    sales_orders_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                so_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedSalesOrderUpdateRequestRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedSalesOrderUpdateRequestRequest"];
+                "multipart/form-data": components["schemas"]["PatchedSalesOrderUpdateRequestRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SalesOrderResponse"];
+                };
+            };
+        };
+    };
+    sales_orders_commit_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                so_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SalesOrderCommitRequestRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["SalesOrderCommitRequestRequest"];
+                "multipart/form-data": components["schemas"]["SalesOrderCommitRequestRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SalesOrderResponse"];
+                };
+            };
+        };
+    };
+    sales_orders_preview_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                so_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SalesOrderPreviewResponse"];
+                };
+            };
+        };
+    };
+    sales_orders_void_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                so_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SalesOrderResponse"];
+                };
             };
         };
     };
