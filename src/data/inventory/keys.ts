@@ -12,4 +12,10 @@ export const inventoryKeys = {
     [...inventoryKeys.all, 'batchesByProduct', productId, opts ?? {}] as const,
   batchesByPo: (poId: string) =>
     [...inventoryKeys.all, 'batchesByPo', poId] as const,
+  detail: (id: string) => [...inventoryKeys.all, 'detail', id] as const,
+  lists: () => [...inventoryKeys.all, 'list'] as const,
+  list: (filters?: Record<string, unknown>) =>
+    [...inventoryKeys.lists(), filters ?? {}] as const,
+  recallReport: (batchId: string, opts?: Record<string, unknown>) =>
+    [...inventoryKeys.all, 'recallReport', batchId, opts ?? {}] as const,
 }

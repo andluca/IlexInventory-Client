@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { http, HttpResponse } from 'msw'
 import { createElement } from 'react'
 import { server } from '@/test/server'
-import { useMovements, useBatchesByProduct, useBatchesByPoId } from './queries'
+import { useMovements, useBatchesByProduct, useBatchesByPoId, useBatch, useBatchesList } from './queries'
 import { ApiError } from '@/api/errors'
 import { procurementKeys } from '@/data/procurement/keys'
 
@@ -346,5 +346,101 @@ describe('useBatchesByPoId', () => {
     const batchIds = result.current.data?.items.map((b) => b.id)
     expect(batchIds).toContain('batch-a')
     expect(batchIds).toContain('batch-d')
+  })
+})
+
+describe('useBatch', () => {
+  it('resolves with batch on 200', async () => {
+    server.use(
+      http.get('http://localhost:8000/api/v1/batches/batch-1', () =>
+        HttpResponse.json(BATCH_1),
+      ),
+    )
+
+    const qc = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } })
+    const { result } = renderHook(() => useBatch('batch-1'), {
+      wrapper: makeWrapper(qc),
+    })
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+    expect(result.current.data?.id).toBe('batch-1')
+    expect(result.current.data?.batch_code).toBe('B001')
+  })
+
+  it('surfaces 404 as error with status===404 and does NOT retry', async () => {
+    let hitCount = 0
+    server.use(
+      http.get('http://localhost:8000/api/v1/batches/batch-missing', () => {
+        hitCount++
+        return HttpResponse.json({ error: 'not_found' }, { status: 404 })
+      }),
+    )
+
+    const qc = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } })
+    const { result } = renderHook(() => useBatch('batch-missing'), {
+      wrapper: makeWrapper(qc),
+    })
+
+    await waitFor(() => expect(result.current.isError).toBe(true))
+    expect(ApiError.is(result.current.error)).toBe(true)
+    expect((result.current.error as ApiError).status).toBe(404)
+    // retry: false on 404 means exactly one hit
+    expect(hitCount).toBe(1)
+  })
+})
+
+describe('useBatchesList', () => {
+  it('forwards product_id, is_recalled, expiring_within, offset, limit to query string', async () => {
+    let captured: Record<string, string | null> = {}
+    server.use(
+      http.get('http://localhost:8000/api/v1/batches', ({ request }) => {
+        const url = new URL(request.url)
+        captured = {
+          product_id: url.searchParams.get('product_id'),
+          is_recalled: url.searchParams.get('is_recalled'),
+          expiring_within: url.searchParams.get('expiring_within'),
+          limit: url.searchParams.get('limit'),
+          offset: url.searchParams.get('offset'),
+        }
+        return HttpResponse.json({ items: [], total: 0, limit: 50, offset: 0 })
+      }),
+    )
+
+    const qc = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } })
+    const { result } = renderHook(
+      () =>
+        useBatchesList({
+          product_id: 'prod-1',
+          is_recalled: false,
+          expiring_within: 14,
+          page: 2,
+          limit: 25,
+        }),
+      { wrapper: makeWrapper(qc) },
+    )
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+    expect(captured.product_id).toBe('prod-1')
+    expect(captured.is_recalled).toBe('false')
+    expect(captured.expiring_within).toBe('14')
+    expect(captured.limit).toBe('25')
+    expect(captured.offset).toBe('25') // page 2, limit 25 → offset 25
+  })
+
+  it('resolves with items on 200', async () => {
+    server.use(
+      http.get('http://localhost:8000/api/v1/batches', () =>
+        HttpResponse.json({ items: [BATCH_1], total: 1, limit: 50, offset: 0 }),
+      ),
+    )
+
+    const qc = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } })
+    const { result } = renderHook(() => useBatchesList(), {
+      wrapper: makeWrapper(qc),
+    })
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+    expect(result.current.data?.items).toHaveLength(1)
+    expect(result.current.data?.total).toBe(1)
   })
 })

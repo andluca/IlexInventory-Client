@@ -5,8 +5,9 @@
  *
  * useMovements — cursor-paginated useInfiniteQuery for the movement audit log.
  * useBatchesByProduct — existence helper for the archive-vs-delete branching
- *   on the product detail page. ILE-6 will extend this file with a full
- *   batches list hook; v1 just needs total > 0.
+ *   on the product detail page.
+ * useBatch — single batch detail (ILE-6).
+ * useBatchesList — paginated list with filters (ILE-6).
  */
 
 import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -19,6 +20,7 @@ import type { components } from '@/api/generated/schema'
 
 export type MovementListResponse = components['schemas']['MovementListResponse']
 export type BatchListResponse = components['schemas']['BatchListResponse']
+export type BatchResponse = components['schemas']['BatchResponse']
 
 // ---------------------------------------------------------------------------
 // useMovements
@@ -95,6 +97,68 @@ export function useBatchesByProduct(
       })
       return data as BatchListResponse
     },
+    staleTime: 30_000,
+  })
+}
+
+// ---------------------------------------------------------------------------
+// useBatch
+// ---------------------------------------------------------------------------
+
+export function useBatch(id: string): UseQueryResult<BatchResponse, ApiError> {
+  return useQuery<BatchResponse, ApiError>({
+    queryKey: inventoryKeys.detail(id),
+    queryFn: async () => {
+      const { data } = await apiClient.GET('/api/v1/batches/{batch_id}', {
+        params: { path: { batch_id: id } },
+      })
+      return data as BatchResponse
+    },
+    staleTime: 30_000,
+    retry: (failureCount, error) => {
+      if (ApiError.is(error) && error.status === 404) return false
+      return failureCount < 3
+    },
+  })
+}
+
+// ---------------------------------------------------------------------------
+// useBatchesList
+// ---------------------------------------------------------------------------
+
+export interface BatchesListParams {
+  product_id?: string
+  is_recalled?: boolean
+  expiring_within?: number
+  page?: number
+  limit?: number
+}
+
+export function useBatchesList(
+  params: BatchesListParams = {},
+): UseQueryResult<BatchListResponse, ApiError> {
+  const { product_id, is_recalled, expiring_within, page = 1, limit = 50 } = params
+
+  return useQuery<BatchListResponse, ApiError>({
+    queryKey: inventoryKeys.list({ product_id, is_recalled, expiring_within, page, limit }),
+    queryFn: async () => {
+      const query: {
+        product_id?: string
+        is_recalled?: boolean
+        expiring_within?: number
+        limit?: number
+        offset?: number
+      } = { limit, offset: (page - 1) * limit }
+      if (product_id !== undefined) query.product_id = product_id
+      if (is_recalled !== undefined) query.is_recalled = is_recalled
+      if (expiring_within !== undefined) query.expiring_within = expiring_within
+
+      const { data } = await apiClient.GET('/api/v1/batches', {
+        params: { query },
+      })
+      return data as BatchListResponse
+    },
+    placeholderData: (prev) => prev,
     staleTime: 30_000,
   })
 }

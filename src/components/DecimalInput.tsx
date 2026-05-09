@@ -12,7 +12,8 @@ import type { TextInputProps } from '@mantine/core'
  * - value: string (never number)
  * - onChange: (next: string) => void (emits strings only)
  * - precision: number of decimal places (default 4, matches numeric(14,4))
- * - Validates against regex: ^\d*(\.\d{0,N})?$ — allows empty string, integers, decimals
+ * - allowNegative: if true, accepts a leading "-" (for signed quantities — ILE-6 adjust/write-off)
+ * - Validates against regex: ^\d*(\.\d{0,N})?$ (or ^-?\d*(\.\d{0,N})?$ when allowNegative)
  * - On blur:
  *   1. Strips trailing decimal point ("5." → "5")
  *   2. Collapses multi-leading-zeros on integers ("007" → "7")
@@ -37,6 +38,7 @@ export type DecimalInputProps = {
   description?: TextInputProps['description']
   required?: boolean
   className?: string
+  allowNegative?: boolean
 }
 
 export function DecimalInput({
@@ -53,11 +55,14 @@ export function DecimalInput({
   description,
   required,
   className,
+  allowNegative = false,
 }: DecimalInputProps) {
   // Build regex dynamically from precision.
   // Allows: empty string, integers, decimals up to precision places
-  // Pattern: ^\d*(\.\d{0,N})?$
-  const regex = new RegExp(`^\\d*(\\.\\d{0,${precision}})?$`)
+  // Pattern: ^\d*(\.\d{0,N})?$ (or ^-?\d*(\.\d{0,N})?$ when allowNegative)
+  const regex = allowNegative
+    ? new RegExp(`^-?\\d*(\\.\\d{0,${precision}})?$`)
+    : new RegExp(`^\\d*(\\.\\d{0,${precision}})?$`)
 
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     const next = event.target.value
