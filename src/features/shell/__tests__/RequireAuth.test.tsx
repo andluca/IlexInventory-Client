@@ -74,13 +74,21 @@ describe('RequireAuth', () => {
     })
 
     // Clean up pending request
-    resolve(HttpResponse.json({ id: 'u1', email: 'a@b.com' }))
+    resolve(
+      HttpResponse.json({
+        user: { id: 'u1', email: 'a@b.com' },
+        csrf_token: 'test-csrf-token',
+      }),
+    )
   })
 
   it('renders children when auth query resolves with user data', async () => {
     server.use(
       http.get('http://localhost:8000/api/v1/auth/me', () =>
-        HttpResponse.json({ id: 'u1', email: 'user@example.com' }),
+        HttpResponse.json({
+          user: { id: 'u1', email: 'user@example.com' },
+          csrf_token: 'test-csrf-token',
+        }),
       ),
     )
 

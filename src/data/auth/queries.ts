@@ -7,8 +7,9 @@
 import { useQuery } from '@tanstack/react-query'
 import type { UseQueryResult } from '@tanstack/react-query'
 import { ApiError } from '@/api/errors'
+import { setCsrfToken } from '@/api/csrf-store'
 import { authKeys } from './keys'
-import type { AuthMeResponse } from './types'
+import type { AuthMeResponse, AuthRawResponse } from './types'
 
 /**
  * useAuthMe — single source of truth for "is the user authenticated?".
@@ -56,7 +57,12 @@ export function useAuthMe(): UseQueryResult<AuthMeResponse, ApiError> {
           ...(envelope.fields !== undefined ? { fields: envelope.fields } : {}),
         })
       }
-      return response.json() as Promise<AuthMeResponse>
+      const raw = (await response.json()) as AuthRawResponse
+      // Stash the CSRF token so apiClient can echo it back as X-CSRFToken.
+      // Required cross-origin (Netlify ↔ Railway) where document.cookie
+      // can't read the BE-set cookie.
+      setCsrfToken(raw.csrf_token)
+      return raw.user as AuthMeResponse
     },
     staleTime: 5 * 60_000,
     retry: false,

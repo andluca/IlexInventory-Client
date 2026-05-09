@@ -72,10 +72,16 @@ describe('SignupPage', () => {
   it('happy path: 200 signup → navigates to /', async () => {
     server.use(
       http.post('http://localhost:8000/api/v1/auth/signup', () =>
-        new HttpResponse(null, { status: 200 }),
+        HttpResponse.json({
+          user: { id: 'u1', email: 'new@example.com' },
+          csrf_token: 'test-csrf-token',
+        }),
       ),
       http.get('http://localhost:8000/api/v1/auth/me', () =>
-        HttpResponse.json({ id: 'u1', email: 'new@example.com' }),
+        HttpResponse.json({
+          user: { id: 'u1', email: 'new@example.com' },
+          csrf_token: 'test-csrf-token',
+        }),
       ),
     )
 

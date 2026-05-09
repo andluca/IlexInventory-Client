@@ -18,11 +18,17 @@ describe('useLoginMutation', () => {
   it('on 200 invalidates ["auth","me"] query', async () => {
     server.use(
       http.post('http://localhost:8000/api/v1/auth/login', () =>
-        new HttpResponse(null, { status: 200 }),
+        HttpResponse.json({
+          user: { id: 'usr_1', email: 'test@example.com' },
+          csrf_token: 'test-csrf-token',
+        }),
       ),
       // Handler for refetch triggered by invalidation
       http.get('http://localhost:8000/api/v1/auth/me', () =>
-        HttpResponse.json({ id: 'usr_1', email: 'test@example.com' }),
+        HttpResponse.json({
+          user: { id: 'usr_1', email: 'test@example.com' },
+          csrf_token: 'test-csrf-token',
+        }),
       ),
     )
 
@@ -104,10 +110,16 @@ describe('useSignupMutation', () => {
   it('on 200 invalidates ["auth","me"]', async () => {
     server.use(
       http.post('http://localhost:8000/api/v1/auth/signup', () =>
-        new HttpResponse(null, { status: 200 }),
+        HttpResponse.json({
+          user: { id: 'usr_new', email: 'new@example.com' },
+          csrf_token: 'test-csrf-token',
+        }),
       ),
       http.get('http://localhost:8000/api/v1/auth/me', () =>
-        HttpResponse.json({ id: 'usr_new', email: 'new@example.com' }),
+        HttpResponse.json({
+          user: { id: 'usr_new', email: 'new@example.com' },
+          csrf_token: 'test-csrf-token',
+        }),
       ),
     )
 

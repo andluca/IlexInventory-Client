@@ -15,6 +15,7 @@
 import createClient from 'openapi-fetch'
 import type { paths } from './generated/schema'
 import { ApiError } from './errors'
+import { getCsrfToken } from './csrf-store'
 import { uuidv7 } from '@/utils/uuidv7'
 
 // ---------------------------------------------------------------------------
@@ -91,9 +92,14 @@ function buildClient(): OpenApiClient {
     async onRequest({ request, schemaPath }) {
       const method = request.method.toUpperCase()
 
-      // 1. CSRF header on state-changing requests
+      // 1. CSRF header on state-changing requests.
+      // Cross-origin (Netlify ↔ Railway): the browser sends the csrftoken
+      // cookie back to the BE automatically but JS here cannot read it via
+      // document.cookie. Prefer the in-memory token populated from the
+      // /auth/me + login + signup response bodies; fall back to the cookie
+      // for same-origin flows (dev with vite proxy).
       if (method === 'POST' || method === 'PATCH' || method === 'DELETE') {
-        const csrf = getCookie('csrftoken')
+        const csrf = getCsrfToken() ?? getCookie('csrftoken')
         if (csrf) {
           request.headers.set('X-CSRFToken', csrf)
         }

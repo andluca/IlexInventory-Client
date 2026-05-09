@@ -17,7 +17,10 @@ describe('useAuthMe', () => {
   it('resolves with { id, email } on 200', async () => {
     server.use(
       http.get('http://localhost:8000/api/v1/auth/me', () =>
-        HttpResponse.json({ id: 'usr_1', email: 'test@example.com' }),
+        HttpResponse.json({
+          user: { id: 'usr_1', email: 'test@example.com' },
+          csrf_token: 'test-csrf-token',
+        }),
       ),
     )
 

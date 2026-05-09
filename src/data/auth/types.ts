@@ -16,3 +16,11 @@
 export type LoginRequest = { email: string; password: string }
 export type SignupRequest = { email: string; password: string }
 export type AuthMeResponse = { id: string; email: string }
+
+/** Raw /auth/{me,login,signup} response body. The user object is
+ * unwrapped into AuthMeResponse by callers; csrf_token is stashed into
+ * the in-memory store for cross-origin X-CSRFToken use. */
+export type AuthRawResponse = {
+  user: { id: string; email: string }
+  csrf_token: string
+}

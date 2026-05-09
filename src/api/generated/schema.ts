@@ -17,7 +17,9 @@ export interface paths {
          * Log in with email and password
          * @description Authenticate an existing user and set session cookie.
          *
-         *     CSRF-exempt: same reasoning as SignupView.
+         *     CSRF-exempt for the inbound request (no token possible pre-login);
+         *     sets the csrftoken cookie on the response so subsequent mutations
+         *     have a token to echo back via X-CSRFToken.
          */
         post: operations["auth_login_create"];
         delete?: never;
@@ -60,6 +62,8 @@ export interface paths {
          * @description Return the currently authenticated user.
          *
          *     Returns 401 when no session is present (IsAuthenticated default).
+         *     Refreshes the csrftoken cookie on every call so a long-lived session
+         *     can recover from a missing/stale token by re-bootstrapping.
          */
         get: operations["auth_me_retrieve"];
         put?: never;
@@ -83,9 +87,9 @@ export interface paths {
          * Sign up a new account
          * @description Create a new account and log in immediately.
          *
-         *     CSRF-exempt: client cannot have a CSRF token before first login.
-         *     Achieved by setting authentication_classes=[] which disables DRF's
-         *     SessionAuthentication CSRF enforcement.
+         *     CSRF-exempt for the inbound request (no token possible pre-signup);
+         *     sets the csrftoken cookie on the response so subsequent mutations
+         *     have a token to echo back via X-CSRFToken.
          */
         post: operations["auth_signup_create"];
         delete?: never;

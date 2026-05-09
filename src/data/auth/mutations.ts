@@ -13,8 +13,39 @@ import type { QueryClient, UseMutationResult } from '@tanstack/react-query'
 import { notifications } from '@mantine/notifications'
 import { apiClient } from '@/api/client'
 import { ApiError } from '@/api/errors'
+import { clearCsrfToken, setCsrfToken } from '@/api/csrf-store'
 import { authKeys } from './keys'
-import type { LoginRequest, SignupRequest } from './types'
+import type { AuthRawResponse, LoginRequest, SignupRequest } from './types'
+
+/** Read the auth response body and stash the csrf_token. The endpoint
+ * schemas ship `content?: never`, so we re-fetch the body manually here. */
+async function postAuthAndStash(path: string, body: unknown): Promise<void> {
+  const baseUrl = (
+    import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000/api/v1'
+  ).replace(/\/api\/v1\/?$/, '')
+  const response = await globalThis.fetch(`${baseUrl}${path}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(body),
+  })
+  if (response.status >= 400) {
+    let envelope: { error?: string; detail?: string; fields?: Record<string, string> } = {}
+    try {
+      envelope = (await response.json()) as typeof envelope
+    } catch {
+      envelope = { error: `http_${response.status}` }
+    }
+    throw new ApiError({
+      status: response.status,
+      error: envelope.error ?? `http_${response.status}`,
+      ...(envelope.detail !== undefined ? { detail: envelope.detail } : {}),
+      ...(envelope.fields !== undefined ? { fields: envelope.fields } : {}),
+    })
+  }
+  const raw = (await response.json()) as AuthRawResponse
+  setCsrfToken(raw.csrf_token)
+}
 
 // ---------------------------------------------------------------------------
 // useLoginMutation
@@ -25,11 +56,10 @@ export function useLoginMutation(): UseMutationResult<void, ApiError, LoginReque
 
   return useMutation<void, ApiError, LoginRequest>({
     mutationFn: async ({ email, password }) => {
-      // body cast to never: BE schema ships requestBody?: never for /auth/login.
-      // BE follow-up: add OpenApiTypes.OBJECT schema so this cast is removable.
-      await apiClient.POST('/api/v1/auth/login', {
-        body: { email, password } as never,
-      })
+      // Bypass apiClient here so we can read the response body and stash
+      // the csrf_token immediately — needed cross-origin where the cookie
+      // is invisible to JS.
+      await postAuthAndStash('/api/v1/auth/login', { email, password })
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: authKeys.me() })
@@ -46,11 +76,7 @@ export function useSignupMutation(): UseMutationResult<void, ApiError, SignupReq
 
   return useMutation<void, ApiError, SignupRequest>({
     mutationFn: async ({ email, password }) => {
-      // body cast to never: BE schema ships requestBody?: never for /auth/signup.
-      // BE follow-up: add OpenApiTypes.OBJECT schema so this cast is removable.
-      await apiClient.POST('/api/v1/auth/signup', {
-        body: { email, password } as never,
-      })
+      await postAuthAndStash('/api/v1/auth/signup', { email, password })
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: authKeys.me() })
@@ -91,6 +117,7 @@ export function useLogoutMutation(
 
       if (!isOtherError) {
         qc.clear()
+        clearCsrfToken()
       }
     },
     onError: (error) => {

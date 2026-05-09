@@ -66,10 +66,16 @@ describe('LoginPage', () => {
   it('happy path: 200 login → navigates to /', async () => {
     server.use(
       http.post('http://localhost:8000/api/v1/auth/login', () =>
-        new HttpResponse(null, { status: 200 }),
+        HttpResponse.json({
+          user: { id: 'u1', email: 'user@example.com' },
+          csrf_token: 'test-csrf-token',
+        }),
       ),
       http.get('http://localhost:8000/api/v1/auth/me', () =>
-        HttpResponse.json({ id: 'u1', email: 'user@example.com' }),
+        HttpResponse.json({
+          user: { id: 'u1', email: 'user@example.com' },
+          csrf_token: 'test-csrf-token',
+        }),
       ),
     )
 
