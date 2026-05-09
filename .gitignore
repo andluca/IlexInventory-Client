@@ -34,3 +34,6 @@ npm-debug.log*
 
 # Claude Code agent state
 .claude/scheduled_tasks.lock
+
+# Playwright CLI page snapshots (local-only debugging artifacts)
+.playwright-cli/
