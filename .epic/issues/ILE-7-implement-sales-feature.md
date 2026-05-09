@@ -1,9 +1,9 @@
 ---
 id: ILE-7
 github_id: null
-status: open
+status: completed
 assignee: null
-state: Queued
+state: Completed
 type: item
 depends_on: [ILE-6]
 ---
