@@ -60,12 +60,13 @@ fi
 
 # ---------------------------------------------------------------------------
 # Gate 5: No NumberInput in features (outside integer-only allowlist)
-# Allowlist (ILE-6): expiring_within days field in StockByBatchPage is an
+# Allowlist (ILE-6): expiring_within days field in StockByBatchPage/StockListFilters is an
 # integer-only counter (days), not a money/qty field — NumberInput is permitted.
+# ILE-16: StockByBatchPage now delegates to StockListFilters; both are allowlisted.
 # ---------------------------------------------------------------------------
 echo "Gate 5: no NumberInput in src/features/ (outside integer allowlist)..."
 GATE5=$(grep -RE "\bNumberInput\b" src/features/ 2>/dev/null \
-  | grep -v "StockByBatchPage" || true)
+  | grep -vE "StockByBatchPage|StockListFilters" || true)
 if [ -n "$GATE5" ]; then
   fail "NumberInput found in src/features/ — use <DecimalInput> for money/qty:"
   echo "$GATE5"

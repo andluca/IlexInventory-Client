@@ -30,19 +30,7 @@ import { AllocationsTable } from './AllocationsTable'
 import { VoidConfirmModal } from './VoidConfirmModal'
 import { formatMoney } from '@/utils/money'
 import Decimal from 'decimal.js'
-
-function statusBadgeColor(status: string): string {
-  if (status === 'voided') return 'red'
-  if (status === 'committed') return 'green'
-  return 'gray'
-}
-
-// BE quirk (BE-D6 / SPEC §3.6): a voided SO keeps `status='committed'` and
-// signals the void via `voided_at`. Surface "voided" whenever voided_at is set.
-function effectiveStatus(so: { status: string; voided_at: string | null }): string {
-  if (so.voided_at) return 'voided'
-  return so.status
-}
+import { statusBadgeColor, effectiveStatus } from './utils'
 
 export function SoDetailPage({ soId }: { soId: string }) {
   const navigate = useNavigate()
