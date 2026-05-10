@@ -163,6 +163,8 @@ export function useDeleteProduct(): UseMutationResult<void, ApiError, DeleteProd
 // ---------------------------------------------------------------------------
 
 export function useImportProducts(): UseMutationResult<ProductImportResponse, ApiError, FormData> {
+  const queryClient = useQueryClient()
+
   return useMutation<ProductImportResponse, ApiError, FormData>({
     mutationFn: async (formData) => {
       // requestBody?: never for /products/import in the generated schema.
@@ -173,6 +175,9 @@ export function useImportProducts(): UseMutationResult<ProductImportResponse, Ap
         body: formData as never,
       })
       return data as ProductImportResponse
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: catalogKeys.lists() })
     },
     retry: false,
   })

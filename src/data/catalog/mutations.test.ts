@@ -328,6 +328,33 @@ describe('useImportProducts', () => {
     expect(capturedKey!.length).toBeGreaterThan(0)
   })
 
+  it('on 200 invalidates catalogKeys.lists()', async () => {
+    const importResponse = { imported: 3, failed: [] }
+
+    server.use(
+      http.post('http://localhost:8000/api/v1/products/import', () =>
+        HttpResponse.json(importResponse),
+      ),
+    )
+
+    const qc = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } })
+    const invalidateSpy = vi.spyOn(qc, 'invalidateQueries')
+
+    const { result } = renderHook(() => useImportProducts(), {
+      wrapper: makeWrapper(qc),
+    })
+
+    const formData = new FormData()
+    formData.append('file', new File(['sku,name\nA-1,Alpha\nA-2,Beta\nA-3,Gamma'], 'products.csv', { type: 'text/csv' }))
+
+    act(() => {
+      result.current.mutate(formData)
+    })
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+    expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: catalogKeys.lists() })
+  })
+
   it('on 400 exposes ApiError with detail', async () => {
     server.use(
       http.post('http://localhost:8000/api/v1/products/import', () =>
