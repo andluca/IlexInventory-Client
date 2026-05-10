@@ -24,3 +24,16 @@ body {
   @apply bg-charcoal text-text font-sans;
   font-variant-numeric: tabular-nums;
 }
+
+/*
+ * Accessibility: when the OS/browser requests reduced transparency, drop
+ * backdrop-blur and switch the chrome surface back to solid charcoal.
+ * !important is intentional — this is a media-query accessibility fallback,
+ * the canonical case for overriding utility classes.
+ */
+@media (prefers-reduced-transparency: reduce) {
+  .bg-surface-elevated {
+    background-color: var(--mantine-color-dark-7) !important;
+    backdrop-filter: none !important;
+  }
+}

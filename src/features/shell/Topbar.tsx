@@ -1,5 +1,6 @@
 import { useNavigate } from '@tanstack/react-router'
 import { Group, Menu, ActionIcon, Avatar, Box, Text } from '@mantine/core'
+import { chromeBorder } from '@/theme/borders'
 import { IconUser, IconLogout } from '@tabler/icons-react'
 import { useAuthMe } from '@/data/auth/queries'
 import { useLogoutMutation } from '@/data/auth/mutations'
@@ -29,13 +30,13 @@ export function Topbar() {
     <Box
       component="header"
       px="md"
-      py="xs"
+      py="md"
+      className="bg-surface-elevated backdrop-blur-elevated"
       style={{
-        borderBottom: '1px solid var(--mantine-color-dark-4)',
+        borderBottom: chromeBorder,
         position: 'sticky',
         top: 0,
         zIndex: 10,
-        backgroundColor: 'var(--mantine-color-dark-7)',
       }}
     >
       <Group justify="space-between">

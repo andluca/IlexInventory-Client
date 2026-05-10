@@ -158,6 +158,22 @@ The prototype's default focus rings are too subtle on charcoal — this is a pol
 
 ---
 
+## Surfaces & elevation
+
+Charcoal mode uses borders for content depth; chrome surfaces use translucency + backdrop-blur for a soft separation from scrolling content. Applied only to sidebar / topbar / right rail — never to data tables or cards (glass on dense tabular content reads as noise).
+
+| Token | Value | Use |
+|---|---|---|
+| `surfaces.elevated` | `rgb(18 18 18 / 0.72)` | Chrome background — charcoal at 0.72 alpha. AA-safe for `text` and `text-muted`. |
+| `surfaces.elevatedBlur` | `12px` | Backdrop-blur magnitude paired with `surfaces.elevated`. |
+| `shadows.elevated` | `0 4px 16px 0 rgb(0 0 0 / 0.35)` | Opt-in soft outer shadow for hover-elevation. Not default — cards still use borders. |
+
+Tailwind exposes these as `bg-surface-elevated`, `backdrop-blur-elevated`, `shadow-elevated`. Mantine exposes them under `theme.other.surfaceElevated` / `surfaceElevatedBlur` / `shadowElevated`.
+
+**Accessibility:** `global.css` includes `@media (prefers-reduced-transparency: reduce) { .bg-surface-elevated { background-color: var(--mantine-color-dark-7) !important; backdrop-filter: none !important; } }` — chrome degrades to solid charcoal when the user requests reduced transparency.
+
+---
+
 ## Polish targets vs prototype
 
 - **Mono character width** — JetBrains Mono ships slightly different metrics than Geist Mono. Re-verify lot-code column widths after font swap; lot codes like `LOT-2024-A11` should stay aligned across rows.

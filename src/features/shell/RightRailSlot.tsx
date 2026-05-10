@@ -11,6 +11,7 @@
 import { Stack, Text, TextInput, ActionIcon, Group, Box } from '@mantine/core'
 import { IconMessageCircle, IconChevronRight } from '@tabler/icons-react'
 import { useAgentPanel } from '@/stores/agent-panel'
+import { chromeBorder } from '@/theme/borders'
 
 export function RightRailSlot() {
   const open = useAgentPanel((s) => s.open)
@@ -24,8 +25,9 @@ export function RightRailSlot() {
         data-testid="agent-panel"
         w={36}
         h="100vh"
+        className="bg-surface-elevated backdrop-blur-elevated"
         style={{
-          borderLeft: '1px solid var(--mantine-color-dark-4)',
+          borderLeft: chromeBorder,
           position: 'sticky',
           top: 0,
           flexShrink: 0,
@@ -50,8 +52,9 @@ export function RightRailSlot() {
       data-testid="agent-panel"
       w={320}
       h="100vh"
+      className="bg-surface-elevated backdrop-blur-elevated"
       style={{
-        borderLeft: '1px solid var(--mantine-color-dark-4)',
+        borderLeft: chromeBorder,
         position: 'sticky',
         top: 0,
         display: 'flex',
@@ -59,7 +62,7 @@ export function RightRailSlot() {
         flexShrink: 0,
       }}
     >
-      <Group justify="space-between" p="sm" style={{ borderBottom: '1px solid var(--mantine-color-dark-4)' }}>
+      <Group justify="space-between" p="sm" style={{ borderBottom: chromeBorder }}>
         <Group gap="xs">
           <IconMessageCircle size={16} color="var(--mantine-color-primary-6)" />
           <Text size="sm" fw={600}>Ask Ilex</Text>
@@ -81,7 +84,7 @@ export function RightRailSlot() {
         </Text>
       </Stack>
 
-      <Box p="sm" style={{ borderTop: '1px solid var(--mantine-color-dark-4)' }}>
+      <Box p="sm" style={{ borderTop: chromeBorder }}>
         <TextInput
           placeholder="Ask anything about your inventory…"
           disabled

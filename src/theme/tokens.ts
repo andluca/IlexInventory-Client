@@ -107,11 +107,28 @@ export const radius = {
 } as const
 
 // ---------------------------------------------------------------------------
+// Surfaces
+// ---------------------------------------------------------------------------
+
+export const surfaces = {
+  // Charcoal-only translucent chrome background. Picked alpha so AA contrast
+  // holds for `text` (#FAFAFA) and `textMuted` (#9C9C9C). Charcoal base is
+  // #121212 — at 0.72 opacity, effective luminance still well below text.
+  elevated: 'rgb(18 18 18 / 0.72)',
+  // Backdrop-blur magnitude for the chrome surface. 12px is enough to soften
+  // anything behind the chrome without dominating the perception of depth.
+  elevatedBlur: '12px',
+} as const
+
+// ---------------------------------------------------------------------------
 // Shadows
 // ---------------------------------------------------------------------------
 
 export const shadows = {
   card: 'none', // Charcoal uses borders, not shadows, for depth
+  // Soft outer shadow for hover-elevation on opt-in cards. Not applied by
+  // default — cards still use borders for depth (charcoal contract).
+  elevated: '0 4px 16px 0 rgb(0 0 0 / 0.35)',
   modal: '0 8px 32px 0 rgb(0 0 0 / 0.5)',
   popover: '0 4px 16px 0 rgb(0 0 0 / 0.4)',
 } as const

@@ -1,5 +1,5 @@
 import { createTheme, colorsTuple } from '@mantine/core'
-import { colors, fontFamily, radius } from './tokens'
+import { colors, fontFamily, radius, surfaces, shadows } from './tokens'
 
 /**
  * Mantine charcoal theme.
@@ -62,6 +62,15 @@ export const mantineTheme = createTheme({
   // Focus
   // ---------------------------------------------------------------------------
   focusRing: 'auto',
+
+  // ---------------------------------------------------------------------------
+  // Other — surface + shadow tokens for component overrides and theme.other consumers
+  // ---------------------------------------------------------------------------
+  other: {
+    surfaceElevated: surfaces.elevated,
+    surfaceElevatedBlur: surfaces.elevatedBlur,
+    shadowElevated: shadows.elevated,
+  },
 
   // ---------------------------------------------------------------------------
   // Component defaults

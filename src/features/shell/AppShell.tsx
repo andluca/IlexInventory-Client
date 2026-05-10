@@ -35,7 +35,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   }, [enabled])
 
   return (
-    <Box style={{ display: 'flex', minHeight: '100vh' }}>
+    <Box style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
       <Sidebar />
       <Box style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
         <Topbar />

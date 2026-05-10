@@ -1,5 +1,6 @@
 import { Link, useLocation } from '@tanstack/react-router'
 import { NavLink, Stack, Image, Text, Tooltip, Box } from '@mantine/core'
+import { chromeBorder } from '@/theme/borders'
 import {
   IconLayoutDashboard,
   IconBox,
@@ -41,8 +42,9 @@ export function Sidebar() {
       component="aside"
       w={240}
       h="100vh"
+      className="bg-surface-elevated backdrop-blur-elevated"
       style={{
-        borderRight: '1px solid var(--mantine-color-dark-4)',
+        borderRight: chromeBorder,
         position: 'sticky',
         top: 0,
         flexShrink: 0,
@@ -50,7 +52,7 @@ export function Sidebar() {
         flexDirection: 'column',
       }}
     >
-      <Box p="md" style={{ borderBottom: '1px solid var(--mantine-color-dark-4)' }}>
+      <Box py="md" px="md" style={{ borderBottom: chromeBorder }}>
         <Image src="/ilex_logo_v4.svg" alt="Ilex Inventory" h={28} fit="contain" w="auto" />
       </Box>
 
@@ -87,7 +89,7 @@ export function Sidebar() {
         })}
       </Stack>
 
-      <Box p="md" style={{ borderTop: '1px solid var(--mantine-color-dark-4)' }}>
+      <Box p="md" style={{ borderTop: chromeBorder }}>
         <Text size="xs" c="dimmed">
           Built for F&B CPG brands
         </Text>

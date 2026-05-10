@@ -6,7 +6,7 @@
  * Optional icon (60px circle), title, body, action buttons, agent-prompt CTA.
  */
 
-import { Box, Button, Group, Stack, Text, Title } from '@mantine/core'
+import { Box, Button, Card, Group, Stack, Text, Title } from '@mantine/core'
 import { Link } from '@tanstack/react-router'
 import { IconSparkles } from '@tabler/icons-react'
 import { useAgentPanel } from '@/stores/agent-panel'
@@ -38,15 +38,13 @@ export function EmptyState({ icon: Icon, title, body, actions, agentPrompt }: Em
   }
 
   return (
-    <Box
+    <Card
+      withBorder
+      padding="xl"
       style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        minHeight: 400,
-        border: '1px dashed var(--mantine-color-dark-4)',
-        borderRadius: 'var(--mantine-radius-md)',
-        padding: 'var(--mantine-spacing-xl)',
       }}
     >
       <Stack align="center" gap="md" maw={480}>
@@ -113,6 +111,6 @@ export function EmptyState({ icon: Icon, title, body, actions, agentPrompt }: Em
           </Group>
         ) : null}
       </Stack>
-    </Box>
+    </Card>
   )
 }

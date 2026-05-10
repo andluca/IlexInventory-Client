@@ -1,6 +1,6 @@
 import type { Config } from 'tailwindcss'
 import plugin from 'tailwindcss/plugin'
-import { colors, fontFamily, spacing, radius, density } from './src/theme/tokens'
+import { colors, fontFamily, spacing, radius, density, surfaces, shadows } from './src/theme/tokens'
 
 /**
  * Tailwind config — charcoal-only dark palette.
@@ -56,6 +56,15 @@ const config: Config = {
       minHeight: {
         'row-default': density.rowHeightDefault,
         'row-floor': density.rowHeightFloor,
+      },
+      backgroundColor: {
+        'surface-elevated': surfaces.elevated,
+      },
+      backdropBlur: {
+        elevated: surfaces.elevatedBlur,
+      },
+      boxShadow: {
+        elevated: shadows.elevated,
       },
     },
   },
