@@ -74,7 +74,15 @@ export function useSosList(
 // useSo
 // ---------------------------------------------------------------------------
 
-export function useSo(id: string): UseQueryResult<SalesOrderResponse, ApiError> {
+export interface UseSoOptions {
+  enabled?: boolean
+}
+
+export function useSo(
+  id: string,
+  options: UseSoOptions = {},
+): UseQueryResult<SalesOrderResponse, ApiError> {
+  const { enabled = true } = options
   return useQuery<SalesOrderResponse, ApiError>({
     queryKey: salesKeys.detail(id),
     queryFn: async () => {
@@ -83,6 +91,7 @@ export function useSo(id: string): UseQueryResult<SalesOrderResponse, ApiError> 
       })
       return data as SalesOrderResponse
     },
+    enabled,
     staleTime: 30_000,
     retry: (failureCount, error) => {
       if (ApiError.is(error) && error.status === 404) return false

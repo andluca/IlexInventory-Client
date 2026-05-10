@@ -109,7 +109,15 @@ export function useBatchesByProduct(
 // useBatch
 // ---------------------------------------------------------------------------
 
-export function useBatch(id: string): UseQueryResult<BatchResponse, ApiError> {
+export interface UseBatchOptions {
+  enabled?: boolean
+}
+
+export function useBatch(
+  id: string,
+  options: UseBatchOptions = {},
+): UseQueryResult<BatchResponse, ApiError> {
+  const { enabled = true } = options
   return useQuery<BatchResponse, ApiError>({
     queryKey: inventoryKeys.detail(id),
     queryFn: async () => {
@@ -118,6 +126,7 @@ export function useBatch(id: string): UseQueryResult<BatchResponse, ApiError> {
       })
       return data as BatchResponse
     },
+    enabled,
     staleTime: 30_000,
     retry: (failureCount, error) => {
       if (ApiError.is(error) && error.status === 404) return false

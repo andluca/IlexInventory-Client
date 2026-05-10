@@ -5,20 +5,19 @@
  * Reads useMatches() from TanStack Router to determine the current route shape,
  * then fetches the relevant data via existing query hooks (piggybacks on cached results).
  *
- * Per ILE-9 Step 6.
+ * Per ILE-9 Step 6. Refactored in ILE-14: replaced three inline useQuery blocks
+ * (which called apiClient directly) with useBatch / useSo / useProduct data-layer
+ * hooks so the 404-no-retry policy (BE-D4) is inherited automatically.
  */
 
 import { useMatches } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
-import { useBatchesByProduct } from '@/data/inventory/queries'
-import { apiClient } from '@/api/client'
-import { ApiError } from '@/api/errors'
-import { inventoryKeys } from '@/data/inventory/keys'
-import { salesKeys } from '@/data/sales/keys'
-import { catalogKeys } from '@/data/catalog/keys'
+import { useBatch, useBatchesByProduct } from '@/data/inventory/queries'
+import { useSo } from '@/data/sales/queries'
+import { useProduct } from '@/data/catalog/queries'
 import type { BatchResponse } from '@/data/inventory/queries'
 import type { SalesOrderResponse } from '@/data/sales/queries'
 import type { ProductResponse } from '@/data/catalog/queries'
+
 export type CmdkContext =
   | { kind: 'batch'; batchId: string; batch: BatchResponse | undefined }
   | { kind: 'so-draft'; soId: string; so: SalesOrderResponse | undefined }
@@ -54,41 +53,9 @@ export function useCmdkContext(): CmdkContext {
   const productId = productMatch ? ((productMatch.params as Record<string, string>).id ?? '') : ''
 
   // Data queries — enabled only when on the matching route
-  const batchQuery = useQuery<BatchResponse, ApiError>({
-    queryKey: inventoryKeys.detail(batchId),
-    queryFn: async () => {
-      const { data } = await apiClient.GET('/api/v1/batches/{batch_id}', {
-        params: { path: { batch_id: batchId } },
-      })
-      return data as BatchResponse
-    },
-    enabled: isBatchDetail && Boolean(batchId),
-    staleTime: 30_000,
-  })
-
-  const soQuery = useQuery<SalesOrderResponse, ApiError>({
-    queryKey: salesKeys.detail(soId),
-    queryFn: async () => {
-      const { data } = await apiClient.GET('/api/v1/sales-orders/{so_id}', {
-        params: { path: { so_id: soId } },
-      })
-      return data as SalesOrderResponse
-    },
-    enabled: (isSoEdit || isSoDetail) && Boolean(soId),
-    staleTime: 30_000,
-  })
-
-  const productQuery = useQuery<ProductResponse, ApiError>({
-    queryKey: catalogKeys.detail(productId),
-    queryFn: async () => {
-      const { data } = await apiClient.GET('/api/v1/products/{product_id}', {
-        params: { path: { product_id: productId } },
-      })
-      return data as ProductResponse
-    },
-    enabled: isProductDetail && Boolean(productId),
-    staleTime: 30_000,
-  })
+  const batchQuery = useBatch(batchId, { enabled: isBatchDetail && Boolean(batchId) })
+  const soQuery = useSo(soId, { enabled: (isSoEdit || isSoDetail) && Boolean(soId) })
+  const productQuery = useProduct(productId, { enabled: isProductDetail && Boolean(productId) })
 
   const batchesByProductQuery = useBatchesByProduct(productId || 'x', {
     limit: 1,
