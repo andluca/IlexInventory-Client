@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-05-10T16:35:00Z
+Last updated: 2026-05-10T18:15:00Z
 
 ## Issues
 
@@ -15,19 +15,23 @@ Last updated: 2026-05-10T16:35:00Z
 - [x] [ILE-14-cmdk-context-layer-violation.md](ILE-14-cmdk-context-layer-violation.md) - completed
 - [x] [ILE-15-visual-cohesion-tokens.md](ILE-15-visual-cohesion-tokens.md) - completed
 - [x] [ILE-16-list-page-function-size.md](ILE-16-list-page-function-size.md) - completed
-- [~] [ILE-17-cors-allow-headers-idempotency.md](ILE-17-cors-allow-headers-idempotency.md) - blocked (BE-only fix; no FE surface — see Notes)
+- [x] [ILE-17-cors-allow-headers-idempotency.md](ILE-17-cors-allow-headers-idempotency.md) - completed (BE-side, see `IlexInventory-Server` commit `09df7b1`)
 
 ## Summary
 
 Total: 12 issues
-Completed: 11
+Completed: 12
 In progress: 0
 Planned: 0
 Pending: 0
-Blocked: 1
+Blocked: 0
 Failed: 0
 
 ## Execution Log
+
+### ILE-17 — completed 2026-05-10T18:15:00Z
+
+Cross-repo BE fix shipped in `IlexInventory-Server` commit `09df7b1` (`fix(cors): allow idempotency-key in preflight (ILE-17)`). `backend/settings/base.py` now sets `CORS_ALLOW_HEADERS = (*default_headers, "idempotency-key")` alongside an import of `corsheaders.defaults.default_headers`. New preflight test at `backend/apps/core/tests/api/test_cors.py` asserts that `OPTIONS /api/v1/sales-orders/{id}/commit` with `Access-Control-Request-Headers: idempotency-key, x-csrftoken, content-type` returns 200 with `idempotency-key` (and the default `x-csrftoken` + `content-type`) listed in `Access-Control-Allow-Headers`. Full BE suite 499/499 green. FE side: nothing to change — verification happens post-deploy by running `tests/e2e/critical-flow.spec.ts` against the production deploy (deferred to operator).
 
 ### ILE-16 — completed 2026-05-10T17:50:00Z
 

@@ -1,5 +1,7 @@
 # ILE-17 — Cross-repo: BE must allow `Idempotency-Key` in CORS preflight
 
+Status: completed (BE-side, `IlexInventory-Server` commit `09df7b1`)
+
 ## Overview
 
 This is a **BE-side fix** (`IlexInventory-Server/backend/settings/prod.py`) that the FE depends on. Tracked here so the FE issue surface stays the single source of truth for "what's still broken in deploy"; the actual code change happens in the BE repo.
