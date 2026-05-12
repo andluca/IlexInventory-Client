@@ -118,6 +118,23 @@ export const surfaces = {
   // Backdrop-blur magnitude for the chrome surface. 12px is enough to soften
   // anything behind the chrome without dominating the perception of depth.
   elevatedBlur: '12px',
+  // Modal glass — higher opacity for legibility-first overlay surfaces.
+  elevatedHigh: 'rgb(18 18 18 / 0.85)',
+  elevatedHighBlur: '16px',
+  // Tinted status surfaces — ultra-low alpha so they read as a tint, not a fill.
+  tintedTerere: 'rgb(0 193 106 / 0.08)',      // healthy/committed status
+  tintedTereredBorder: 'rgb(0 193 106 / 0.18)',
+  tintedAmber: 'rgb(245 158 11 / 0.10)',      // expiring within 7d
+  tintedAmberBorder: 'rgb(245 158 11 / 0.22)',
+  tintedClay: 'rgb(220 38 38 / 0.10)',        // recalled/expired
+  tintedClayBorder: 'rgb(220 38 38 / 0.22)',
+  // Hairline top-edge border for glass surfaces ("meniscus" light refraction).
+  meniscus: '1px solid rgb(255 255 255 / 0.04)',
+  // Subtle botanical ambient gradient applied to <body>. Alpha is deliberately
+  // ultra-low (0.020 tereré, 0.45 graphite) — reads as warmth, not a glow.
+  ambientGradient:
+    'radial-gradient(ellipse 80% 50% at 15% 0%, rgb(0 193 106 / 0.020) 0%, transparent 60%), ' +
+    'radial-gradient(ellipse 60% 40% at 85% 100%, rgb(54 54 54 / 0.45) 0%, transparent 70%)',
 } as const
 
 // ---------------------------------------------------------------------------
@@ -131,6 +148,10 @@ export const shadows = {
   elevated: '0 4px 16px 0 rgb(0 0 0 / 0.35)',
   modal: '0 8px 32px 0 rgb(0 0 0 / 0.5)',
   popover: '0 4px 16px 0 rgb(0 0 0 / 0.4)',
+  // Opt-in hover lift shadow — deeper than elevated, for interactive cards.
+  hoverLift: '0 8px 24px 0 rgb(0 0 0 / 0.45)',
+  // Glass modal shadow — used when modal surface switches to elevatedHigh (ILE-23).
+  modalGlass: '0 24px 64px 0 rgb(0 0 0 / 0.55)',
 } as const
 
 // ---------------------------------------------------------------------------
@@ -142,4 +163,20 @@ export const focus = {
   ringOffsetColor: 'oklch(0.145 0 0)', // charcoal
   ringOffsetWidth: '2px',
   ringWidth: '2px',
+} as const
+
+// ---------------------------------------------------------------------------
+// Motion
+// ---------------------------------------------------------------------------
+
+export const motion = {
+  duration: {
+    fast: '120ms',
+    base: '180ms',
+    slow: '240ms',
+  },
+  ease: {
+    out: 'cubic-bezier(0.16, 1, 0.3, 1)',
+    inOut: 'cubic-bezier(0.65, 0, 0.35, 1)',
+  },
 } as const

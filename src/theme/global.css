@@ -13,6 +13,18 @@
   /* Focus ring */
   --ring-color: oklch(0.72 0.19 155 / 0.5);
   --ring-offset-color: oklch(0.145 0 0);
+
+  /* Ambient body gradient (ILE-19) — ultra-low alpha, applied via background-image on body. */
+  --ambient-gradient:
+    radial-gradient(ellipse 80% 50% at 15% 0%, rgb(0 193 106 / 0.020) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 85% 100%, rgb(54 54 54 / 0.45) 0%, transparent 70%);
+
+  /* Motion tokens (ILE-19) — consumed by keyframes and inline styles. */
+  --motion-duration-fast: 120ms;
+  --motion-duration-base: 180ms;
+  --motion-duration-slow: 240ms;
+  --motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 html {
@@ -23,6 +35,8 @@ html {
 body {
   @apply bg-charcoal text-text font-sans;
   font-variant-numeric: tabular-nums;
+  background-image: var(--ambient-gradient);
+  background-attachment: fixed;
 }
 
 /*
@@ -32,8 +46,82 @@ body {
  * the canonical case for overriding utility classes.
  */
 @media (prefers-reduced-transparency: reduce) {
-  .bg-surface-elevated {
+  .bg-surface-elevated,
+  .bg-surface-elevated-high {
     background-color: var(--mantine-color-dark-7) !important;
     backdrop-filter: none !important;
+  }
+  .bg-tinted-terere,
+  .bg-tinted-amber,
+  .bg-tinted-clay {
+    background-color: var(--mantine-color-dark-6) !important;
+  }
+  body {
+    background-image: none !important;
+  }
+}
+
+/*
+ * Accessibility: honour prefers-reduced-motion by collapsing all animation
+ * and transition durations to near-zero. Opacity transitions are stripped
+ * alongside transforms — screen readers care about content, not fade ins.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/*
+ * Keyframes for ILE-20 <PageHeader> entry animation.
+ * Consumed by setting data-motion="page-header" on the wrapper element.
+ */
+[data-motion='page-header'] {
+  animation: page-header-in var(--motion-duration-slow) var(--motion-ease-out) both;
+}
+@keyframes page-header-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/*
+ * Sidebar active nav spine indicator (ILE-21).
+ * Consumed by wrapping the active NavLink in <Box className="spine">.
+ */
+.spine {
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: var(--mantine-color-terere-6);
+  border-radius: 1px;
+  animation: spine-in var(--motion-duration-base) var(--motion-ease-out) both;
+}
+@keyframes spine-in {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-motion='page-header'],
+  .spine {
+    animation: none;
   }
 }

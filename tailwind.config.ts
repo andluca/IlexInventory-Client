@@ -1,6 +1,6 @@
 import type { Config } from 'tailwindcss'
 import plugin from 'tailwindcss/plugin'
-import { colors, fontFamily, spacing, radius, density, surfaces, shadows } from './src/theme/tokens'
+import { colors, fontFamily, spacing, radius, density, surfaces, shadows, motion } from './src/theme/tokens'
 
 /**
  * Tailwind config — charcoal-only dark palette.
@@ -59,12 +59,33 @@ const config: Config = {
       },
       backgroundColor: {
         'surface-elevated': surfaces.elevated,
+        'surface-elevated-high': surfaces.elevatedHigh,
+        'tinted-terere': surfaces.tintedTerere,
+        'tinted-amber': surfaces.tintedAmber,
+        'tinted-clay': surfaces.tintedClay,
       },
       backdropBlur: {
         elevated: surfaces.elevatedBlur,
+        'elevated-high': surfaces.elevatedHighBlur,
+      },
+      borderColor: {
+        'tinted-terere': surfaces.tintedTereredBorder,
+        'tinted-amber': surfaces.tintedAmberBorder,
+        'tinted-clay': surfaces.tintedClayBorder,
       },
       boxShadow: {
         elevated: shadows.elevated,
+        'hover-lift': shadows.hoverLift,
+        'modal-glass': shadows.modalGlass,
+      },
+      transitionTimingFunction: {
+        out: motion.ease.out,
+        'in-out': motion.ease.inOut,
+      },
+      transitionDuration: {
+        fast: '120',
+        base: '180',
+        slow: '240',
       },
     },
   },

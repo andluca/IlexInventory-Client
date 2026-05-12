@@ -1,5 +1,5 @@
 import { createTheme, colorsTuple } from '@mantine/core'
-import { colors, fontFamily, radius, surfaces, shadows } from './tokens'
+import { colors, fontFamily, radius, surfaces, shadows, motion } from './tokens'
 
 /**
  * Mantine charcoal theme.
@@ -70,6 +70,22 @@ export const mantineTheme = createTheme({
     surfaceElevated: surfaces.elevated,
     surfaceElevatedBlur: surfaces.elevatedBlur,
     shadowElevated: shadows.elevated,
+    surfaceElevatedHigh: surfaces.elevatedHigh,
+    surfaceElevatedHighBlur: surfaces.elevatedHighBlur,
+    tintedTerere: surfaces.tintedTerere,
+    tintedAmber: surfaces.tintedAmber,
+    tintedClay: surfaces.tintedClay,
+    tintedTereredBorder: surfaces.tintedTereredBorder,
+    tintedAmberBorder: surfaces.tintedAmberBorder,
+    tintedClayBorder: surfaces.tintedClayBorder,
+    meniscus: surfaces.meniscus,
+    shadowHoverLift: shadows.hoverLift,
+    shadowModalGlass: shadows.modalGlass,
+    motionDurationFast: motion.duration.fast,
+    motionDurationBase: motion.duration.base,
+    motionDurationSlow: motion.duration.slow,
+    motionEaseOut: motion.ease.out,
+    motionEaseInOut: motion.ease.inOut,
   },
 
   // ---------------------------------------------------------------------------
