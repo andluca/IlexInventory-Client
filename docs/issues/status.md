@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-05-10T18:15:00Z
+Last updated: 2026-05-11T00:00:00Z
 
 ## Issues
 
@@ -16,13 +16,27 @@ Last updated: 2026-05-10T18:15:00Z
 - [x] [ILE-15-visual-cohesion-tokens.md](ILE-15-visual-cohesion-tokens.md) - completed
 - [x] [ILE-16-list-page-function-size.md](ILE-16-list-page-function-size.md) - completed
 - [x] [ILE-17-cors-allow-headers-idempotency.md](ILE-17-cors-allow-headers-idempotency.md) - completed (BE-side, see `IlexInventory-Server` commit `09df7b1`)
+- [ ] [ILE-18-remove-agent-chat.md](ILE-18-remove-agent-chat.md) - planned (no deps)
+- [ ] [ILE-19-botanical-token-system.md](ILE-19-botanical-token-system.md) - planned (no deps)
+- [ ] [ILE-20-shell-primitives.md](ILE-20-shell-primitives.md) - planned (requires ILE-19)
+- [ ] [ILE-21-unify-header-with-spine.md](ILE-21-unify-header-with-spine.md) - planned (requires ILE-18, ILE-19)
+- [ ] [ILE-22-adopt-page-primitives.md](ILE-22-adopt-page-primitives.md) - planned (requires ILE-20)
+- [ ] [ILE-23-glass-overlays-kpi.md](ILE-23-glass-overlays-kpi.md) - planned (requires ILE-19, ILE-20)
+
+## Dependency layers (for `/build`)
+
+- **Layer 1** (parallel): ILE-18, ILE-19
+- **Layer 2** (parallel): ILE-20, ILE-21
+- **Layer 3** (parallel): ILE-22, ILE-23
+
+Source plan: `/home/andluca/.claude/plans/i-want-to-refactor-linear-sphinx.md` — "Operations Terminal × Botanical Glass" refactor.
 
 ## Summary
 
-Total: 12 issues
+Total: 18 issues
 Completed: 12
 In progress: 0
-Planned: 0
+Planned: 6
 Pending: 0
 Blocked: 0
 Failed: 0
