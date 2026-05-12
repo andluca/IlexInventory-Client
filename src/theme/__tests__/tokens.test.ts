@@ -3,6 +3,7 @@
  * Confirms each new export is a non-empty string, catches typos,
  * and confirms ESM resolution.
  */
+import { describe, it, expect } from 'vitest'
 import { surfaces, shadows, motion } from '../tokens'
 
 describe('surfaces — existing tokens', () => {

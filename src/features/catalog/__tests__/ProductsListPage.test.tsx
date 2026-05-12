@@ -106,7 +106,7 @@ describe('ProductsListPage', () => {
     expect(screen.getByText('TEA-001')).toBeInTheDocument()
   })
 
-  it('empty no-filters: renders empty state with CTAs + agent-prompt button', async () => {
+  it('empty no-filters: renders empty state with CTAs', async () => {
     server.use(
       http.get('http://localhost:8000/api/v1/products', () =>
         HttpResponse.json({ items: [], total: 0, limit: 50, offset: 0 }),
@@ -121,8 +121,6 @@ describe('ProductsListPage', () => {
     })
 
     expect(screen.getAllByRole('button', { name: /new product/i }).length).toBeGreaterThan(0)
-    // Agent prompt button
-    expect(screen.getByRole('button', { name: /ask ilex/i })).toBeInTheDocument()
   })
 
   it('empty with search filter: renders filter empty state', async () => {

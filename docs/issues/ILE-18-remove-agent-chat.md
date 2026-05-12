@@ -1,6 +1,6 @@
 # ILE-18 — Remove agent chat (RightRailSlot + agent-panel store + cmdk Agent group)
 
-Status: planned
+Status: completed
 
 ## Overview
 

@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-05-11T00:00:00Z
+Last updated: 2026-05-12T01:35:00Z
 
 ## Issues
 
@@ -16,8 +16,8 @@ Last updated: 2026-05-11T00:00:00Z
 - [x] [ILE-15-visual-cohesion-tokens.md](ILE-15-visual-cohesion-tokens.md) - completed
 - [x] [ILE-16-list-page-function-size.md](ILE-16-list-page-function-size.md) - completed
 - [x] [ILE-17-cors-allow-headers-idempotency.md](ILE-17-cors-allow-headers-idempotency.md) - completed (BE-side, see `IlexInventory-Server` commit `09df7b1`)
-- [ ] [ILE-18-remove-agent-chat.md](ILE-18-remove-agent-chat.md) - planned (no deps)
-- [ ] [ILE-19-botanical-token-system.md](ILE-19-botanical-token-system.md) - planned (no deps)
+- [x] [ILE-18-remove-agent-chat.md](ILE-18-remove-agent-chat.md) - completed
+- [x] [ILE-19-botanical-token-system.md](ILE-19-botanical-token-system.md) - completed
 - [ ] [ILE-20-shell-primitives.md](ILE-20-shell-primitives.md) - planned (requires ILE-19)
 - [ ] [ILE-21-unify-header-with-spine.md](ILE-21-unify-header-with-spine.md) - planned (requires ILE-18, ILE-19)
 - [ ] [ILE-22-adopt-page-primitives.md](ILE-22-adopt-page-primitives.md) - planned (requires ILE-20)
@@ -25,7 +25,7 @@ Last updated: 2026-05-11T00:00:00Z
 
 ## Dependency layers (for `/build`)
 
-- **Layer 1** (parallel): ILE-18, ILE-19
+- **Layer 1** (parallel): ~~ILE-18, ILE-19~~ — completed 2026-05-12
 - **Layer 2** (parallel): ILE-20, ILE-21
 - **Layer 3** (parallel): ILE-22, ILE-23
 
@@ -34,14 +34,28 @@ Source plan: `/home/andluca/.claude/plans/i-want-to-refactor-linear-sphinx.md` �
 ## Summary
 
 Total: 18 issues
-Completed: 12
+Completed: 14
 In progress: 0
-Planned: 6
+Planned: 4
 Pending: 0
 Blocked: 0
 Failed: 0
 
 ## Execution Log
+
+### ILE-19 — completed 2026-05-12T01:35:00Z
+
+Botanical token system shipped as additive expansion. (1) `src/theme/tokens.ts` extended `surfaces` with `elevatedHigh` (rgb 18 18 18 / 0.85), `elevatedHighBlur` (16px), three tinted variants (`tintedTerere/Amber/Clay` at 0.08–0.10 alpha) + matching borders, `meniscus` (1px hairline at white 0.04), and a two-stop `ambientGradient` (tereré dawn top-left + graphite warmth bottom-right). Extended `shadows` with `hoverLift` and `modalGlass`. New `motion` block exports duration (fast/base/slow) + ease (out/inOut). (2) `tailwind.config.ts` imports `motion`; extends `backgroundColor` / `backdropBlur` / `borderColor` / `boxShadow` / `transitionTimingFunction` / `transitionDuration` with the new tokens. (3) `src/theme/mantine.ts` exposes 16 new keys under `theme.other`. (4) `src/theme/global.css` declares CSS vars for ambient + motion in `:root`; extends `body` to apply `background-image: var(--ambient-gradient)` with `background-attachment: fixed`; extends `prefers-reduced-transparency` block to neutralize new glass + tinted classes + ambient gradient; new `prefers-reduced-motion` block strips transitions; appends `[data-motion="page-header"]` + `@keyframes page-header-in` + `.spine` + `@keyframes spine-in` (consumed by ILE-20 and ILE-21 — owning all keyframes here keeps layer-2 surfaces disjoint). (5) `docs/design/tokens.md` gains "Surfaces & elevation: extended" and "Motion" sections. (6) New `src/theme/__tests__/tokens.test.ts` with 20 smoke tests. Initially missing `import { describe, it, expect } from 'vitest'` — fixed post-merge during gate run.
+
+Files modified: `src/theme/tokens.ts`, `src/theme/mantine.ts`, `tailwind.config.ts`, `src/theme/global.css`, `docs/design/tokens.md`. Files created: `src/theme/__tests__/tokens.test.ts`. Merge: `4152f03`. Suite 409 → 422 (+13 incl. token smoke + dropped agentPrompt assertions). Typecheck clean, lint + 6 grep gates clean, generate:api --check matches snapshot, build green. Zero app behaviour change beyond the (intentional + subtle) body ambient gradient.
+
+### ILE-18 — completed 2026-05-12T01:35:00Z
+
+Agent chat placeholder removed end-to-end. Deleted 4 files: `src/features/shell/RightRailSlot.tsx` + test, `src/stores/agent-panel.ts`, `src/features/shell/cmdk-items/agent.ts`. Plus the now-orphaned `src/features/shell/cmdk-items/__tests__/agent.test.ts` (missed by the worktree executor — caught by post-merge typecheck). Edited `AppShell.tsx` (drop RightRailSlot mount), `CmdkPalette.tsx` (drop `useAgentPanel` + `buildAgentActions` imports + `openAgent` + Agent action group), `EmptyState.tsx` (drop `agentPrompt` prop + `useAgentPanel` import + Ask-Ilex button), three list pages (`ProductsListPage`, `SosListPage`, `PosListPage` — drop `agentPrompt="..."`), and four tests. Two test files (`ProductsListPage.test.tsx`, `SosListPage.test.tsx`) had "Ask Ilex" assertions in their empty-state tests — also missed by the worktree executor, caught by post-merge Vitest run, fixed by dropping the assertions and renaming the test cases. Final grep check: `grep -RE "useAgentPanel|agent-panel|RightRailSlot|agentPrompt|buildAgentActions" src/` returns empty.
+
+Files deleted (4): RightRailSlot.tsx + test, agent-panel.ts, cmdk-items/agent.ts, cmdk-items/__tests__/agent.test.ts. Files modified (10): AppShell.tsx + test, CmdkPalette.tsx + test, EmptyState.tsx + test, ProductsListPage.tsx + test, PosListPage.tsx, SosListPage.tsx + test. Merge: `57ca1e4`.
+
+**Build orchestration notes for future runs:** the parallel-worktree executor subagent stopped before running its validation gates (no Bash permission in its tool scope at this session); orchestrator (main) ran the gates and applied the missed cleanups. The worktree branches were briefly lost during a `cd`-induced HEAD drift in the orchestrator; merges were recovered from dangling commits via `git fsck --lost-found` + `git merge --no-ff <sha>`. Future `/build` runs: prefer `git -C <path>` over `cd <path>` in the orchestrator's shell, and ensure the executor subagent inherits Bash permissions so it can finish its own gates within its worktree.
 
 ### ILE-17 — completed 2026-05-10T18:15:00Z
 
