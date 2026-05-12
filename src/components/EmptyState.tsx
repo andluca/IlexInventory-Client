@@ -3,13 +3,11 @@
  *
  * Per docs/design/components.md §EmptyState.
  * Centered column, dashed border on surface-2, padding 2xl, min-height 400px.
- * Optional icon (60px circle), title, body, action buttons, agent-prompt CTA.
+ * Optional icon (60px circle), title, body, action buttons.
  */
 
 import { Box, Button, Card, Group, Stack, Text, Title } from '@mantine/core'
 import { Link } from '@tanstack/react-router'
-import { IconSparkles } from '@tabler/icons-react'
-import { useAgentPanel } from '@/stores/agent-panel'
 
 type ActionItem = {
   label: string
@@ -23,20 +21,9 @@ type EmptyStateProps = {
   title: string
   body?: string
   actions?: ActionItem[]
-  agentPrompt?: string
 }
 
-export function EmptyState({ icon: Icon, title, body, actions, agentPrompt }: EmptyStateProps) {
-  const setOpen = useAgentPanel((s) => s.setOpen)
-  const setPrefilledQuery = useAgentPanel((s) => s.setPrefilledQuery)
-
-  function handleAskIlex() {
-    if (agentPrompt) {
-      setPrefilledQuery(agentPrompt)
-    }
-    setOpen(true)
-  }
-
+export function EmptyState({ icon: Icon, title, body, actions }: EmptyStateProps) {
   return (
     <Card
       withBorder
@@ -74,9 +61,9 @@ export function EmptyState({ icon: Icon, title, body, actions, agentPrompt }: Em
           </Text>
         )}
 
-        {(actions && actions.length > 0) || agentPrompt ? (
+        {actions && actions.length > 0 ? (
           <Group justify="center" gap="sm">
-            {actions?.map((action) =>
+            {actions.map((action) =>
               action.href ? (
                 <Button
                   key={action.label}
@@ -97,16 +84,6 @@ export function EmptyState({ icon: Icon, title, body, actions, agentPrompt }: Em
                   {action.label}
                 </Button>
               ),
-            )}
-
-            {agentPrompt && (
-              <Button
-                variant="subtle"
-                leftSection={<IconSparkles size={14} />}
-                onClick={handleAskIlex}
-              >
-                Ask Ilex
-              </Button>
             )}
           </Group>
         ) : null}

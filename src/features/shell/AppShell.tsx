@@ -5,7 +5,6 @@ import { useManualBatchModal } from '@/stores/manual-batch-modal'
 import { applyFloorClass } from './floorMode'
 import { Sidebar } from './Sidebar'
 import { Topbar } from './Topbar'
-import { RightRailSlot } from './RightRailSlot'
 import { CmdkPalette } from './CmdkPalette'
 import { ManualBatchModal } from '@/features/inventory/ManualBatchModal'
 
@@ -13,12 +12,12 @@ import { ManualBatchModal } from '@/features/inventory/ManualBatchModal'
  * AppShell — wraps every authenticated page (per SPEC §2.8).
  *
  * Layout:
- *   ┌─────────┬──────────────────────────┬─────────────┐
- *   │         │  Topbar (sticky)         │             │
- *   │ Sidebar ├──────────────────────────┤  RightRail  │
- *   │ (240px) │  Main column (Outlet)    │  (320px)    │
- *   │ sticky  │  scrolls                 │  sticky     │
- *   └─────────┴──────────────────────────┴─────────────┘
+ *   ┌─────────┬──────────────────────────┐
+ *   │         │  Topbar (sticky)         │
+ *   │ Sidebar ├──────────────────────────┤
+ *   │ (240px) │  Main column (Outlet)    │
+ *   │ sticky  │  scrolls                 │
+ *   └─────────┴──────────────────────────┘
  *
  * Floor-mode side effect: toggles <html class="floor"> based on the store.
  * Lives here, not in the store, so stores stay side-effect-free.
@@ -43,7 +42,6 @@ export function AppShell({ children }: { children: ReactNode }) {
           {children}
         </Box>
       </Box>
-      <RightRailSlot />
       {/* CmdkPalette mounts once — keyboard shortcut "mod+K" handled by Spotlight */}
       <CmdkPalette />
       {/* ManualBatchModal bound to useManualBatchModal store — opened from palette or BatchDetailPage */}

@@ -1,15 +1,14 @@
 /**
  * src/components/EmptyState.test.tsx
  *
- * TDD for ILE-9 Step 1 — EmptyState shared component.
- * 4 tests per plan:
+ * TDD for EmptyState shared component.
+ * 3 tests:
  *  1. renders title + body
  *  2. renders icon when given
  *  3. primary + secondary actions trigger correct handlers/links
- *  4. agentPrompt button calls useAgentPanel.setPrefilledQuery + setOpen(true)
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { MantineProvider } from '@mantine/core'
 import {
@@ -22,7 +21,6 @@ import {
 } from '@tanstack/react-router'
 import { mantineTheme } from '@/theme/mantine'
 import { EmptyState } from './EmptyState'
-import { useAgentPanel } from '@/stores/agent-panel'
 
 async function renderEmptyState(props: React.ComponentProps<typeof EmptyState>) {
   const rootRoute = createRootRoute({ component: Outlet })
@@ -41,11 +39,6 @@ async function renderEmptyState(props: React.ComponentProps<typeof EmptyState>) 
     </MantineProvider>,
   )
 }
-
-beforeEach(() => {
-  // Reset zustand store between tests
-  useAgentPanel.setState({ open: false, prefilledQuery: '' })
-})
 
 describe('EmptyState', () => {
   it('renders title and body copy', async () => {
@@ -79,19 +72,4 @@ describe('EmptyState', () => {
     expect(screen.getByRole('link', { name: /learn more/i })).toBeInTheDocument()
   })
 
-  it('agentPrompt button opens agent panel with the prefilled query', async () => {
-    await renderEmptyState({
-      title: 'No products',
-      agentPrompt: 'Want me to import from CSV?',
-    })
-
-    const askButton = screen.getByRole('button', { name: /ask ilex/i })
-    expect(askButton).toBeInTheDocument()
-
-    fireEvent.click(askButton)
-
-    const state = useAgentPanel.getState()
-    expect(state.open).toBe(true)
-    expect(state.prefilledQuery).toBe('Want me to import from CSV?')
-  })
 })

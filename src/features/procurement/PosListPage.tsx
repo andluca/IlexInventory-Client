@@ -55,7 +55,7 @@ export function PosListPage() {
       {list.isLoading && <LoadingSkeleton rows={5} />}
       {list.isSuccess && items.length === 0 && !hasFilters && (
         <EmptyState title="No purchase orders yet" body="Create your first PO to start receiving inventory."
-          actions={[{ label: 'New purchase order', href: '/purchase-orders/new', primary: true }]} agentPrompt="Draft a PO for top supplier?" />
+          actions={[{ label: 'New purchase order', href: '/purchase-orders/new', primary: true }]} />
       )}
       {list.isSuccess && items.length === 0 && hasFilters && (
         <Box ta="center" py="xl">

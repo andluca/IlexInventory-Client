@@ -56,7 +56,7 @@ export function ProductsListPage() {
         {!isError && total === 0 && !hasFilters && (
           <EmptyState title="No products yet" body="Create your first product or import from CSV."
             actions={[{ label: 'New product', onClick: () => setNewProductOpened(true), primary: true }, { label: 'Import CSV', onClick: () => setImportCsvOpened(true) }]}
-            agentPrompt="Want me to import from CSV?" />
+            />
         )}
         {!isError && total === 0 && hasFilters && (
           <Stack align="center" py="xl" gap="sm">

@@ -1,20 +1,19 @@
 /**
  * src/features/shell/__tests__/CmdkPalette.test.tsx
  *
- * TDD for ILE-9 Step 7 — CmdkPalette integration.
- * 5 tests per plan:
+ * TDD for CmdkPalette integration.
+ * 4 tests:
  *  1. mod+K opens palette (via keyboard shortcut)
  *  2. click on <CmdkTrigger> opens palette
  *  3. Navigate action fires navigate on click
  *  4. Act group shows "Recall this batch" on /batches/:id route (non-recalled batch)
- *  5. Agent action sets useAgentPanel.prefilledQuery + open=true
  *
  * NOTE: Spotlight's keyboard shortcut (mod+K) relies on Mantine's SpotlightRoot
  * mounting document event listeners. In jsdom we simulate via spotlight.open().
- * Tests 3-5 use the actions API directly since Spotlight renders a portal/modal.
+ * Tests 3-4 use the actions API directly since Spotlight renders a portal/modal.
  */
 
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import {
   createMemoryHistory,
@@ -32,7 +31,6 @@ import { server } from '@/test/server'
 import { mantineTheme } from '@/theme/mantine'
 import { CmdkPalette } from '../CmdkPalette'
 import { CmdkTrigger } from '../CmdkTrigger'
-import { useAgentPanel } from '@/stores/agent-panel'
 import { spotlight } from '@mantine/spotlight'
 
 const BATCH_ACTIVE = {
@@ -52,11 +50,8 @@ const BATCH_ACTIVE = {
   updated_at: '2024-01-01T00:00:00Z',
 }
 
-beforeEach(() => {
-  useAgentPanel.setState({ open: false, prefilledQuery: '' })
-  // jsdom doesn't implement scrollIntoView — Mantine Spotlight calls it on selection
-  window.HTMLElement.prototype.scrollIntoView = () => {}
-})
+// jsdom doesn't implement scrollIntoView — Mantine Spotlight calls it on selection
+window.HTMLElement.prototype.scrollIntoView = () => {}
 
 async function renderPaletteAtPath(path: string) {
   const queryClient = new QueryClient({
@@ -175,33 +170,4 @@ describe('CmdkPalette', () => {
     })
   })
 
-  it('Agent action sets useAgentPanel.prefilledQuery + open=true when clicked', async () => {
-    await renderPaletteAtPath('/')
-    spotlight.open()
-
-    await waitFor(() => {
-      expect(screen.getByRole('dialog')).toBeInTheDocument()
-    })
-
-    // Type a query in the search box — spotlight uses combobox role for its input
-    const dialog = screen.getByRole('dialog')
-    const searchInput = dialog.querySelector('input[type="search"], input[placeholder]') as HTMLInputElement
-    expect(searchInput).toBeTruthy()
-    fireEvent.change(searchInput, { target: { value: 'low stock' } })
-
-    await waitFor(() => {
-      expect(document.body.textContent).toContain("Ask Ilex: 'low stock'")
-    })
-
-    // Click the agent action
-    const agentButton = Array.from(document.querySelectorAll('[role="option"], button')).find(
-      (el) => el.textContent?.includes("Ask Ilex: 'low stock'"),
-    )
-    expect(agentButton).toBeTruthy()
-    fireEvent.click(agentButton!)
-
-    const state = useAgentPanel.getState()
-    expect(state.open).toBe(true)
-    expect(state.prefilledQuery).toBe('low stock')
-  })
 })

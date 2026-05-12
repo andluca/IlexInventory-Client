@@ -49,7 +49,7 @@ export function SosListPage() {
       {list.isLoading && <LoadingSkeleton rows={5} />}
       {list.isSuccess && items.length === 0 && !hasFilters && (
         <EmptyState title="No sales orders yet" body="Draft your first SO to see FEFO in action."
-          actions={[{ label: 'New SO', href: '/sales-orders/new', primary: true }]} agentPrompt="Create an SO for recent customer?" />
+          actions={[{ label: 'New SO', href: '/sales-orders/new', primary: true }]} />
       )}
       {list.isSuccess && items.length === 0 && hasFilters && (
         <Box ta="center" py="xl">

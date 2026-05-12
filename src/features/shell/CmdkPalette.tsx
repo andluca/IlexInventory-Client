@@ -2,7 +2,7 @@
  * src/features/shell/CmdkPalette.tsx
  *
  * Mounts a single <Spotlight> instance inside <AppShell> alongside <Outlet>.
- * Composes four action groups: Navigate, Create, Act, Agent.
+ * Composes three action groups: Navigate, Create, Act.
  * Keyboard shortcut "mod+K" is handled by Mantine Spotlight automatically.
  *
  * Per ILE-9 Step 7 (SPEC §3.9).
@@ -11,30 +11,21 @@
 import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { Spotlight } from '@mantine/spotlight'
-import { useAgentPanel } from '@/stores/agent-panel'
 import { useManualBatchModal } from '@/stores/manual-batch-modal'
 import { useActModalBus } from '@/stores/act-modal-bus'
 import { buildNavigateActions } from './cmdk-items/navigate'
 import { buildCreateActions } from './cmdk-items/create'
 import { buildActActions } from './cmdk-items/act'
-import { buildAgentActions } from './cmdk-items/agent'
 import { useCmdkContext } from './cmdk-items/useCmdkContext'
 
 export function CmdkPalette() {
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
 
-  const setAgentOpen = useAgentPanel((s) => s.setOpen)
-  const setPrefilledQuery = useAgentPanel((s) => s.setPrefilledQuery)
   const setManualBatchOpen = useManualBatchModal((s) => s.setOpen)
   const requestBus = useActModalBus((s) => s.request_)
 
   const ctx = useCmdkContext()
-
-  function openAgent(q: string) {
-    setPrefilledQuery(q)
-    setAgentOpen(true)
-  }
 
   const navigateGroup = buildNavigateActions((opts) => {
     void navigate(opts)
@@ -53,14 +44,11 @@ export function CmdkPalette() {
     openArchive: (productId) => requestBus({ kind: 'archive', productId }),
   })
 
-  const agentGroup = buildAgentActions(query, openAgent)
-
   // Build the actions array — filter out empty act group
   const allGroups = [
     navigateGroup,
     createGroup,
     ...(actGroup.actions.length > 0 ? [actGroup] : []),
-    agentGroup,
   ]
 
   return (

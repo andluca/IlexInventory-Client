@@ -91,29 +91,22 @@ describe('AppShell', () => {
     expect(outerBox?.style.overflow).toBe('hidden')
   })
 
-  it('sidebar, topbar, and right rail carry bg-surface-elevated chrome class', async () => {
+  it('sidebar and topbar carry bg-surface-elevated chrome class', async () => {
     renderAppShell()
 
     await waitFor(() => {
       expect(screen.getByTestId('page-content')).toBeInTheDocument()
     })
 
-    // Sidebar: <aside> without data-testid (the sidebar)
     // Topbar: <header>
-    // RightRailSlot: <aside data-testid="agent-panel">
     const header = document.querySelector('header')
-    const agentPanel = screen.getByTestId('agent-panel')
 
-    // All chrome surfaces must carry both Tailwind utility classes
+    // Chrome surfaces must carry both Tailwind utility classes
     expect(header?.className).toContain('bg-surface-elevated')
     expect(header?.className).toContain('backdrop-blur-elevated')
 
-    expect(agentPanel.className).toContain('bg-surface-elevated')
-    expect(agentPanel.className).toContain('backdrop-blur-elevated')
-
-    // Sidebar aside (not the agent panel) — select by role
-    const asides = document.querySelectorAll('aside')
-    const sidebar = Array.from(asides).find((el) => !el.dataset['testid'])
+    // Sidebar aside — select by role
+    const sidebar = document.querySelector('aside')
     expect(sidebar?.className).toContain('bg-surface-elevated')
     expect(sidebar?.className).toContain('backdrop-blur-elevated')
   })
