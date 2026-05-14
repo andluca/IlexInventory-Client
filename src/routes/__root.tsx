@@ -6,6 +6,7 @@ import { queryClient } from '@/router'
 import { mantineTheme } from '@/theme/mantine'
 import '@mantine/core/styles.css'
 import '@mantine/notifications/styles.css'
+import '@mantine/spotlight/styles.css'
 
 /**
  * Root route — mounts providers and the global Notifications host.
