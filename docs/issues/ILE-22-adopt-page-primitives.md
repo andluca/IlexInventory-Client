@@ -1,6 +1,6 @@
 # ILE-22 — Adopt `<PageHeader>` + `<ErrorState>` + `<StatusBanner>` across all 16 pages
 
-Status: planned
+Status: completed
 
 ## Overview
 

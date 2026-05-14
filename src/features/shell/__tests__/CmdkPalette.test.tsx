@@ -170,4 +170,10 @@ describe('CmdkPalette', () => {
     })
   })
 
+  // Glass-styling correctness on the Spotlight is verified by manual smoke
+  // (see ILE-23 acceptance criteria). jsdom does not serialize Mantine's
+  // `styles` prop into inline `style` attributes — Mantine generates CSS
+  // classes via emotion which jsdom does not fully compute. A behavioural
+  // assertion here would be brittle; we trust Mantine's tested behavior.
+
 })

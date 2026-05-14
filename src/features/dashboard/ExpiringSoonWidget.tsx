@@ -45,7 +45,13 @@ export function ExpiringSoonWidget({ within, today }: ExpiringSoonWidgetProps) {
   const viewAllHref = `/stock?expiring_within=${within}`
 
   return (
-    <Card withBorder p="lg" h="100%">
+    <Card
+      withBorder
+      p="lg"
+      h="100%"
+      className="bg-surface-elevated backdrop-blur-elevated"
+      style={{ borderTop: 'var(--mantine-other-meniscus, 1px solid rgb(255 255 255 / 0.06))' }}
+    >
       <Stack gap="md" h="100%">
         <Group justify="space-between" align="flex-start">
           <Stack gap={2}>

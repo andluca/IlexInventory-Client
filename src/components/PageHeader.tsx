@@ -12,9 +12,9 @@ import type { ReactNode } from 'react'
 
 type PageHeaderProps = {
   title: string
-  subtitle?: string
+  subtitle?: string | undefined
   /** SKU / lot code / PO-N / SO-N — mono uppercase tracked-wide */
-  contextTag?: string
+  contextTag?: string | undefined
   actions?: ReactNode
 }
 

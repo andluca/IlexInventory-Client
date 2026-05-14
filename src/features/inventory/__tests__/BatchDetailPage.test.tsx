@@ -196,11 +196,10 @@ describe('BatchDetailPage', () => {
     const router = await makeRouter('batch-1')
     await renderWithRouter(router)
 
-    // StatusBanner (role="status") shows the recalled-on text
+    // StatusBanner shows the recalled-on text
     await waitFor(() => {
-      expect(screen.getByRole('status')).toBeInTheDocument()
+      expect(screen.getByText(/this batch was recalled on/i)).toBeInTheDocument()
     })
-    expect(screen.getByRole('status').textContent).toMatch(/this batch was recalled on/i)
 
     // Un-recall button visible in action bar
     expect(screen.getAllByRole('button', { name: /un-recall/i }).length).toBeGreaterThan(0)

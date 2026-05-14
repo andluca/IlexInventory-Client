@@ -543,3 +543,40 @@ Components:
 - `<EmptyState>` — `src/components/EmptyState.tsx`
 
 `<PageHeader>` wraps the top of the content branch (not the loading/error branches). Adopt this pattern explicitly in every list/detail page during ILE-22.
+## Overlay glass policy
+
+**Added in ILE-23. Reference: `src/theme/tokens.ts` (`surfaces`, `shadows`).**
+
+The charcoal design uses a two-tier glass language for overlays. Glass is **never** applied to data tables, form inputs, or line editors — only to container surfaces.
+
+### Tier 1 — Modal / Spotlight (elevatedHigh)
+
+| Token | Value |
+|---|---|
+| `surfaces.elevatedHigh` | `rgb(18 18 18 / 0.85)` |
+| `surfaces.elevatedHighBlur` | `16px` |
+| `surfaces.meniscus` | `1px solid rgb(255 255 255 / 0.06)` |
+| `shadows.modalGlass` | `0 8px 40px 0 rgb(0 0 0 / 0.6), 0 2px 8px 0 rgb(0 0 0 / 0.3)` |
+
+Applied to: all Mantine `<Modal>` via theme component defaults (`src/theme/mantine.ts`); Spotlight command palette via per-instance `styles` prop (theme defaults do not propagate to `@mantine/spotlight`).
+
+Transition: `pop` at 180ms (strips under `prefers-reduced-motion`).
+
+### Tier 2 — Popover / Menu (elevated)
+
+| Token | Value |
+|---|---|
+| `surfaces.elevated` | `rgb(18 18 18 / 0.72)` |
+| `surfaces.elevatedBlur` | `12px` |
+| `surfaces.meniscus` | (same as tier 1) |
+| `shadows.popover` | `0 4px 16px 0 rgb(0 0 0 / 0.4)` |
+
+Applied to: all Mantine `<Popover.Dropdown>` and `<Menu.Dropdown>` via theme component defaults.
+
+### KPI dashboard widgets
+
+`ExpiringSoonWidget` and `FinancialSummary` outer `<Card>` wrappers use `surfaces.elevated` + 12px blur (Tailwind classes `bg-surface-elevated backdrop-blur-elevated`). The meniscus top border is applied via the `style` prop. Data tables inside both widgets stay opaque — no glass on table rows, cells, or headers.
+
+### Accessibility
+
+All glass surfaces declare a `@media (prefers-reduced-transparency: reduce)` override (handled by Tailwind's `backdrop-filter` utility) reverting to solid charcoal. The `pop` modal transition strips under `prefers-reduced-motion: reduce` via Mantine's built-in motion hook.

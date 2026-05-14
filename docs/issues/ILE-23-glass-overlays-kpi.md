@@ -1,6 +1,6 @@
 # ILE-23 — Extend glass to overlays + KPI cards (modals, menus, popovers, palette)
 
-Status: planned
+Status: completed
 
 ## Overview
 

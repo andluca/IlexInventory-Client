@@ -114,5 +114,53 @@ export const mantineTheme = createTheme({
         size: 'sm',
       },
     },
+
+    // -------------------------------------------------------------------------
+    // Overlay glass — ILE-23
+    // Modal uses elevatedHigh (0.85 alpha) + 16px blur for legibility over busy
+    // routes. Popover/Menu use elevated (0.72 alpha) + 12px blur — same glass
+    // language as the chrome but at the interaction layer.
+    // -------------------------------------------------------------------------
+    Modal: {
+      defaultProps: {
+        transitionProps: { transition: 'pop', duration: 180 },
+        overlayProps: { backgroundOpacity: 0.55, blur: 4 },
+        radius: 'lg',
+      },
+      styles: {
+        content: {
+          backgroundColor: surfaces.elevatedHigh,
+          backdropFilter: `blur(${surfaces.elevatedHighBlur})`,
+          borderTop: surfaces.meniscus,
+          border: '1px solid var(--mantine-color-dark-4)',
+          boxShadow: shadows.modalGlass,
+        },
+        header: { backgroundColor: 'transparent' },
+      },
+    },
+
+    Popover: {
+      styles: {
+        dropdown: {
+          backgroundColor: surfaces.elevated,
+          backdropFilter: `blur(${surfaces.elevatedBlur})`,
+          borderTop: surfaces.meniscus,
+          border: '1px solid var(--mantine-color-dark-4)',
+          boxShadow: shadows.popover,
+        },
+      },
+    },
+
+    Menu: {
+      styles: {
+        dropdown: {
+          backgroundColor: surfaces.elevated,
+          backdropFilter: `blur(${surfaces.elevatedBlur})`,
+          borderTop: surfaces.meniscus,
+          border: '1px solid var(--mantine-color-dark-4)',
+          boxShadow: shadows.popover,
+        },
+      },
+    },
   },
 })

@@ -1,5 +1,5 @@
 import { useNavigate } from '@tanstack/react-router'
-import { Card, Stack, Text, Button, Group, Code } from '@mantine/core'
+import { Card, Stack, Text, Title, Button, Group, Code } from '@mantine/core'
 import { IconLogout } from '@tabler/icons-react'
 import { useAuthMe } from '@/data/auth/queries'
 import { useLogoutMutation } from '@/data/auth/mutations'

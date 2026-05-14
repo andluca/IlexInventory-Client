@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react'
 import { useNavigate, useSearch, Link } from '@tanstack/react-router'
-import { Group, Button, Stack, Box, Text } from '@mantine/core'
+import { Button, Stack, Box, Text } from '@mantine/core'
 import { IconPlus } from '@tabler/icons-react'
 import { usePosList } from '@/data/procurement/queries'
 import { LoadingSkeleton } from '@/components/LoadingSkeleton'

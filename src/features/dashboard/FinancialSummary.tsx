@@ -52,9 +52,18 @@ export interface FinancialSummaryProps {
 export function FinancialSummary({ from, to }: FinancialSummaryProps) {
   const { data, isLoading, error } = useDashboard({ from, to, top: 5 })
 
+  // Shared glass props for the outer container card (ILE-23).
+  // Tables inside stay opaque — glass is for the container only.
+  const outerCardGlass = {
+    withBorder: true,
+    p: 'lg',
+    className: 'bg-surface-elevated backdrop-blur-elevated',
+    style: { borderTop: 'var(--mantine-other-meniscus, 1px solid rgb(255 255 255 / 0.06))' },
+  } as const
+
   if (isLoading) {
     return (
-      <Card withBorder p="lg">
+      <Card {...outerCardGlass}>
         <Text c="dimmed">Loading…</Text>
       </Card>
     )
@@ -62,7 +71,7 @@ export function FinancialSummary({ from, to }: FinancialSummaryProps) {
 
   if (error) {
     return (
-      <Card withBorder p="lg">
+      <Card {...outerCardGlass}>
         <Alert color="red" role="alert">
           {ApiError.is(error) ? (error.detail ?? error.error) : 'Failed to load financial data'}
         </Alert>
@@ -75,7 +84,7 @@ export function FinancialSummary({ from, to }: FinancialSummaryProps) {
   const { totals, top_products } = data
 
   return (
-    <Card withBorder p="lg">
+    <Card {...outerCardGlass}>
       <Stack gap="md">
         <Title order={3}>Financial Summary</Title>
 

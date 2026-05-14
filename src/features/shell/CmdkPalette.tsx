@@ -13,6 +13,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { Spotlight } from '@mantine/spotlight'
 import { useManualBatchModal } from '@/stores/manual-batch-modal'
 import { useActModalBus } from '@/stores/act-modal-bus'
+import { surfaces, shadows } from '@/theme/tokens'
 import { buildNavigateActions } from './cmdk-items/navigate'
 import { buildCreateActions } from './cmdk-items/create'
 import { buildActActions } from './cmdk-items/act'
@@ -51,6 +52,22 @@ export function CmdkPalette() {
     ...(actGroup.actions.length > 0 ? [actGroup] : []),
   ]
 
+  // Glass styles applied per-instance — @mantine/spotlight does not pick up
+  // theme component defaults. Tokens imported directly (ILE-23).
+  const glassStyles = {
+    content: {
+      backgroundColor: surfaces.elevatedHigh,
+      backdropFilter: `blur(${surfaces.elevatedHighBlur})`,
+      borderTop: surfaces.meniscus,
+      border: '1px solid var(--mantine-color-dark-4)',
+      boxShadow: shadows.modalGlass,
+    },
+    search: {
+      backgroundColor: 'transparent',
+      borderBottom: '1px solid var(--mantine-color-dark-4)',
+    },
+  } as const
+
   return (
     <Spotlight
       actions={allGroups}
@@ -61,6 +78,7 @@ export function CmdkPalette() {
       searchProps={{
         placeholder: 'Search or type a command…',
       }}
+      styles={glassStyles}
     />
   )
 }
