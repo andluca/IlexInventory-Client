@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-05-12T01:35:00Z
+Last updated: 2026-05-12T02:30:00Z
 
 ## Issues
 
@@ -18,15 +18,15 @@ Last updated: 2026-05-12T01:35:00Z
 - [x] [ILE-17-cors-allow-headers-idempotency.md](ILE-17-cors-allow-headers-idempotency.md) - completed (BE-side, see `IlexInventory-Server` commit `09df7b1`)
 - [x] [ILE-18-remove-agent-chat.md](ILE-18-remove-agent-chat.md) - completed
 - [x] [ILE-19-botanical-token-system.md](ILE-19-botanical-token-system.md) - completed
-- [ ] [ILE-20-shell-primitives.md](ILE-20-shell-primitives.md) - planned (requires ILE-19)
-- [ ] [ILE-21-unify-header-with-spine.md](ILE-21-unify-header-with-spine.md) - planned (requires ILE-18, ILE-19)
+- [x] [ILE-20-shell-primitives.md](ILE-20-shell-primitives.md) - completed
+- [x] [ILE-21-unify-header-with-spine.md](ILE-21-unify-header-with-spine.md) - completed
 - [ ] [ILE-22-adopt-page-primitives.md](ILE-22-adopt-page-primitives.md) - planned (requires ILE-20)
 - [ ] [ILE-23-glass-overlays-kpi.md](ILE-23-glass-overlays-kpi.md) - planned (requires ILE-19, ILE-20)
 
 ## Dependency layers (for `/build`)
 
 - **Layer 1** (parallel): ~~ILE-18, ILE-19~~ — completed 2026-05-12
-- **Layer 2** (parallel): ILE-20, ILE-21
+- **Layer 2** (parallel): ~~ILE-20, ILE-21~~ — completed 2026-05-12
 - **Layer 3** (parallel): ILE-22, ILE-23
 
 Source plan: `/home/andluca/.claude/plans/i-want-to-refactor-linear-sphinx.md` — "Operations Terminal × Botanical Glass" refactor.
@@ -34,14 +34,28 @@ Source plan: `/home/andluca/.claude/plans/i-want-to-refactor-linear-sphinx.md` �
 ## Summary
 
 Total: 18 issues
-Completed: 14
+Completed: 16
 In progress: 0
-Planned: 4
+Planned: 2
 Pending: 0
 Blocked: 0
 Failed: 0
 
 ## Execution Log
+
+### ILE-21 — completed 2026-05-12T02:30:00Z
+
+Unified header (header-over-sidebar) + tereré spine on active nav shipped. (1) `src/features/shell/Topbar.tsx` → renamed to `Header.tsx` (worktree executor created Header.tsx fresh; orchestrator deleted Topbar.tsx). (2) `Header.tsx` (101 LOC with JSX) is a full-width sticky 3-section bar: 240px left brand block (logo + mono lowercase org tag from `useAuthMe()` with `'ilex'` fallback) → middle `<CmdkTrigger>` → right `<FloorModeToggle>` + user avatar `<Menu>`. Outer `<Box component="header" role="banner">` with `bg-surface-elevated backdrop-blur-elevated`, `borderTop: meniscus`, `borderBottom: chromeBorder`, `position: sticky top:0 zIndex:20`, `py="md"`. (3) `Sidebar.tsx` (96 LOC): removed inner logo block; `h="100vh"` → `h="100%"`; each NavLink wrapped in `<Box style={{ position: 'relative' }}>` with conditional `{isActive && <Box className="spine" aria-hidden data-testid="spine" />}`; Mantine NavLink active background cleared via `styles={{ root: { background: 'transparent' } }}` so the spine is the single active cue. (4) `AppShell.tsx` (55 LOC, under 60 cap): restructured outer flex from row → column → `[<Header /> / row [<Sidebar /> | <main>]]`. Preserved `height:100vh + overflow:hidden`, `<main overflowY:auto>` as sole scroll surface, floor-mode effect, `<CmdkPalette>` + `<ManualBatchModal>` mounts. (5) `AppShell.test.tsx` updated: structural assertions for the new column layout — `<header>` is first child of outer flex; sidebar inside inner row alongside main. ILE-12 scroll contract assertions preserved. One unused `header` variable removed during gate fixup. (6) New `Sidebar.spine.test.tsx` with 3 behavioural tests (memory-router setup, `findByTestId('spine')` async pattern matching the project's TanStack Router test idiom). Initially used sync `getByTestId`; fixed during gate run to use async `findByTestId` + `waitFor`. (7) ILE-21 worktree's duplicate `.spine` keyframes in global.css discarded — ILE-19 already owns those rules in main.
+
+Files modified (4): `Sidebar.tsx`, `AppShell.tsx`, `AppShell.test.tsx`, `Sidebar.spine.test.tsx` (the new file's queries). Files created (2): `Header.tsx`, `Sidebar.spine.test.tsx`. Files deleted (1): `Topbar.tsx`. Suite 422 → 438 (+3 spine + 1 column-layout AppShell test; the ILE-20 +5+4+3 = 12 tests are on the same merge).
+
+### ILE-20 — completed 2026-05-12T02:30:00Z
+
+Shared shell primitives shipped — three new components in `src/components/`. (1) `PageHeader.tsx` (57 LOC): glass-surfaced `<Box data-motion="page-header">` wrapping `<Group justify="space-between">` with `<Stack gap="xs">` containing optional `contextTag` (`ff="monospace" tt="uppercase" letterSpacing:0.08em`), `<Title order={1}>`, optional subtitle, and actions slot on the right. Outer carries `bg-surface-elevated backdrop-blur-elevated`, `borderTop: meniscus`, `border: chromeBorder`, `borderRadius: lg`, `padding: lg`. Entry animation declarative via `[data-motion="page-header"]` rule in `global.css` (ILE-19 owns). (2) `ErrorState.tsx` (42 LOC): `<Alert color="red" variant="light" radius="md" icon role="alert" title="Something went wrong">` body unwraps `ApiError.detail ?? ApiError.error` or falls back to generic; optional `<Button>Retry</Button>`. (3) `StatusBanner.tsx` (46 LOC): `<Box role="status">` with `TONE_BG`/`TONE_BORDER` lookups for terere/amber/clay tinted glass; icon + children in `<Group>`. (4) `docs/design/components.md` extended with §PageHeader, §ErrorState, §StatusBanner, §Page lifecycle (canonical `isError → ErrorState / isPending → LoadingSkeleton / empty → EmptyState / data → content`). (5) 12 new behavioural tests: PageHeader 5 (title h1, subtitle omitted, contextTag mono uppercase + dimmed, actions slot, glass class via `data-motion` selector), ErrorState 4 (ApiError.detail, ApiError.error fallback, generic for non-ApiError, retry callback), StatusBanner 3 (one per tone bg/border). One PageHeader glass-class test initially used `container.firstElementChild.className` which returned empty (Mantine wrapper); fixed during gate run to use `container.querySelector('[data-motion="page-header"]')`.
+
+Files created (7): `src/components/{PageHeader,ErrorState,StatusBanner}.tsx` + colocated `.test.tsx` each, plus appended sections in `docs/design/components.md`. Zero existing pages touched — adoption is ILE-22. All gates green: typecheck clean, lint + 6 grep gates clean, 438/438 tests, generate:api --check no drift, build green.
+
+**Build orchestration notes:** both L2 worktrees branched from `36f2f8a` (before the L1 merges had landed on main), so direct branch-merge would have conflicted. Orchestrator copied files from each worktree into main via `cp` and applied small test fixes (PageHeader glass-class assertion path + Sidebar.spine async pattern + AppShell.test.tsx unused-var) before committing. Future runs: ensure parallel L2+ executor worktrees branch from the L1-merged tip, not from origin/main.
 
 ### ILE-19 — completed 2026-05-12T01:35:00Z
 

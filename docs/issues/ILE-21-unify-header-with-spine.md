@@ -1,6 +1,6 @@
 # ILE-21 — Unify header (header-over-sidebar) + tereré spine on active nav
 
-Status: planned
+Status: completed
 
 ## Overview
 

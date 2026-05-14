@@ -4,7 +4,7 @@ import { useFloorMode } from '@/stores/floor-mode'
 import { useManualBatchModal } from '@/stores/manual-batch-modal'
 import { applyFloorClass } from './floorMode'
 import { Sidebar } from './Sidebar'
-import { Topbar } from './Topbar'
+import { Header } from './Header'
 import { CmdkPalette } from './CmdkPalette'
 import { ManualBatchModal } from '@/features/inventory/ManualBatchModal'
 
@@ -12,12 +12,13 @@ import { ManualBatchModal } from '@/features/inventory/ManualBatchModal'
  * AppShell — wraps every authenticated page (per SPEC §2.8).
  *
  * Layout:
- *   ┌─────────┬──────────────────────────┐
- *   │         │  Topbar (sticky)         │
- *   │ Sidebar ├──────────────────────────┤
- *   │ (240px) │  Main column (Outlet)    │
- *   │ sticky  │  scrolls                 │
- *   └─────────┴──────────────────────────┘
+ *   ┌─────────────────────────────────────────────┐
+ *   │  Header (sticky, full-width)                │
+ *   ├─────────┬───────────────────────────────────┤
+ *   │ Sidebar │  Main column (Outlet)             │
+ *   │ (240px) │  scrolls                          │
+ *   │ sticky  │                                   │
+ *   └─────────┴───────────────────────────────────┘
  *
  * Floor-mode side effect: toggles <html class="floor"> based on the store.
  * Lives here, not in the store, so stores stay side-effect-free.
@@ -34,11 +35,11 @@ export function AppShell({ children }: { children: ReactNode }) {
   }, [enabled])
 
   return (
-    <Box style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
-      <Sidebar />
-      <Box style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-        <Topbar />
-        <Box component="main" style={{ flex: 1, overflowY: 'auto' }}>
+    <Box style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+      <Header />
+      <Box style={{ flex: 1, display: 'flex', minHeight: 0 }}>
+        <Sidebar />
+        <Box component="main" style={{ flex: 1, overflowY: 'auto', minWidth: 0 }}>
           {children}
         </Box>
       </Box>

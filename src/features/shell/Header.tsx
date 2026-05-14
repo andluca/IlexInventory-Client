@@ -1,5 +1,5 @@
 import { useNavigate } from '@tanstack/react-router'
-import { Group, Menu, ActionIcon, Avatar, Box, Text } from '@mantine/core'
+import { Group, Menu, ActionIcon, Avatar, Box, Image, Text } from '@mantine/core'
 import { chromeBorder } from '@/theme/borders'
 import { IconUser, IconLogout } from '@tabler/icons-react'
 import { useAuthMe } from '@/data/auth/queries'
@@ -7,13 +7,18 @@ import { useLogoutMutation } from '@/data/auth/mutations'
 import { FloorModeToggle } from './FloorModeToggle'
 import { CmdkTrigger } from './CmdkTrigger'
 
+const meniscus = '1px solid rgb(255 255 255 / 0.04)'
+
 /**
- * Topbar — sticky top row.
+ * Header — full-width sticky header in three sections.
  *
- * Composition: <CmdkTrigger> (left), <FloorModeToggle> + user menu (right).
- * User menu shows the email and a Logout item; logout clears caches and redirects to /login.
+ * Left (240px, matching sidebar width): logo + org name tag.
+ * Middle: CmdkTrigger (command palette).
+ * Right: FloorModeToggle + user avatar menu.
+ *
+ * Replaces Topbar (ILE-21). History preserved via git mv.
  */
-export function Topbar() {
+export function Header() {
   const { data: user } = useAuthMe()
   const logout = useLogoutMutation()
   const navigate = useNavigate()
@@ -29,20 +34,37 @@ export function Topbar() {
   return (
     <Box
       component="header"
-      px="md"
+      role="banner"
       py="md"
       className="bg-surface-elevated backdrop-blur-elevated"
       style={{
+        borderTop: meniscus,
         borderBottom: chromeBorder,
         position: 'sticky',
         top: 0,
-        zIndex: 10,
+        zIndex: 20,
       }}
     >
-      <Group justify="space-between">
-        <CmdkTrigger />
+      <Group justify="space-between" align="center" style={{ height: '100%' }}>
+        {/* Left: logo + org tag, width matches sidebar */}
+        <Box
+          w={240}
+          px="md"
+          style={{ borderRight: chromeBorder, display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}
+        >
+          <Image src="/ilex_logo_v4.svg" alt="Ilex Inventory" h={28} fit="contain" w="auto" />
+          <Text size="xs" ff="mono" c="dimmed" tt="lowercase" style={{ letterSpacing: '0.04em' }}>
+            {user ? user.email.split('@')[0] : 'ilex'}
+          </Text>
+        </Box>
 
-        <Group gap="md">
+        {/* Middle: command palette trigger */}
+        <Box style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+          <CmdkTrigger />
+        </Box>
+
+        {/* Right: floor toggle + user menu */}
+        <Group gap="md" px="md">
           <FloorModeToggle />
 
           <Menu position="bottom-end" withArrow>

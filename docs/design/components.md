@@ -436,3 +436,110 @@ type FefoPreviewProps = {
 - **This isn't in the v0 handoff.** Build it deliberately — it is the differentiator. See archetype A5 for the layout and SPEC §3.6 for the data contract.
 - Debounce `onRefresh` 300ms when triggered by form-input changes.
 - The estimated-margin number in the footer should render in tereré green when positive, clay when negative.
+
+---
+
+## `<PageHeader>`
+
+**File:** `src/components/PageHeader.tsx`
+**Used in:** Every authenticated list and detail page (adoption in ILE-22).
+
+### Props
+
+```ts
+type PageHeaderProps = {
+  title: string
+  subtitle?: string
+  contextTag?: string   // SKU / lot code / PO-N / SO-N — mono uppercase tracked-wide
+  actions?: ReactNode
+}
+```
+
+### Visual states
+
+- Glass surface: `bg-surface-elevated backdrop-blur-elevated` (Tailwind classes from ILE-19 tokens).
+- Border: `1px solid var(--mantine-color-dark-4)` with hairline meniscus top-edge via `var(--mantine-other-meniscus)`.
+- `data-motion="page-header"` attribute triggers the `page-header-in` entry animation declared in `global.css` (ILE-19).
+- **contextTag** — mono font (`ff="monospace"`), uppercase, `letterSpacing: 0.08em`, dimmed. Used for identifiers that scope the page (e.g., `LOT-2024-A11`, `PO-0042`). Rendered above the title.
+- **actions** — ReactNode slot rendered right-aligned in the same row as the title stack. Typically one or two Mantine `<Button>` instances.
+
+### When to use contextTag
+
+Provide `contextTag` on every detail page where the URL contains a unique identifier that the user should see at a glance (lot codes, PO numbers, SO numbers, SKUs). Leave it empty on plain list pages.
+
+---
+
+## `<ErrorState>`
+
+**File:** `src/components/ErrorState.tsx`
+**Used in:** Every page's `isError` branch (adoption in ILE-22).
+
+### Props
+
+```ts
+type ErrorStateProps = {
+  error: unknown
+  onRetry?: () => void
+}
+```
+
+### ApiError unwrapping policy
+
+```
+ApiError.is(error)
+  ? error.detail ?? error.error   // human-readable detail, or machine error code
+  : 'An error occurred'           // generic fallback for plain Error / unknown
+```
+
+Renders a Mantine `<Alert color="red" variant="light" role="alert" title="Something went wrong">` with the resolved message. When `onRetry` is provided, a small `Retry` button appears below the message text.
+
+Do not distinguish 4xx from 5xx at this layer — that is cross-owner / 404 policy (BE-D4). The page's data hook surfaces the error; `<ErrorState>` presents it uniformly.
+
+---
+
+## `<StatusBanner>`
+
+**File:** `src/components/StatusBanner.tsx`
+**Used in:** Recall / voided / expiring surfaces (adoption in ILE-22).
+
+### Props
+
+```ts
+type StatusBannerProps = {
+  tone: 'terere' | 'amber' | 'clay'
+  icon?: ReactNode
+  children: ReactNode
+}
+```
+
+### Tone semantics
+
+| Tone | Meaning | Background class | Border |
+|---|---|---|---|
+| `terere` | Healthy / committed | `bg-tinted-terere` | `tintedTereredBorder` |
+| `amber` | Warning — expiring within 7d, near-shortfall | `bg-tinted-amber` | `tintedAmberBorder` |
+| `clay` | Destructive state — recalled, voided, expired | `bg-tinted-clay` | `tintedClayBorder` |
+
+Ultra-low alpha tints (8–10%) so the banner reads as a tint, not a fill. `role="status"` for assistive technology.
+
+---
+
+## Page lifecycle
+
+Every authenticated list and detail page must follow this canonical render pattern:
+
+```tsx
+if (isError) return <ErrorState error={error} onRetry={refetch} />
+if (isPending) return <LoadingSkeleton rows={8} />
+if (!data || data.length === 0) return <EmptyState title="..." body="..." />
+return <content />
+```
+
+The order is strict: error before loading before empty before data. This keeps the UI deterministic and prevents flashing an empty state on refetch.
+
+Components:
+- `<ErrorState>` — `src/components/ErrorState.tsx`
+- `<LoadingSkeleton>` — `src/components/LoadingSkeleton.tsx`
+- `<EmptyState>` — `src/components/EmptyState.tsx`
+
+`<PageHeader>` wraps the top of the content branch (not the loading/error branches). Adopt this pattern explicitly in every list/detail page during ILE-22.

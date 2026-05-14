@@ -1,5 +1,5 @@
 import { Link, useLocation } from '@tanstack/react-router'
-import { NavLink, Stack, Image, Text, Tooltip, Box } from '@mantine/core'
+import { NavLink, Stack, Text, Tooltip, Box } from '@mantine/core'
 import { chromeBorder } from '@/theme/borders'
 import {
   IconLayoutDashboard,
@@ -13,9 +13,8 @@ import {
 /**
  * Sidebar — fixed-width 240px left column.
  *
- * Brand mark + nav links to top-level pages. Routes that don't exist yet
- * (catalog/PO/SO/stock land in ILE-4–8) render as disabled with a "Coming soon"
- * tooltip — the surface is fully present from day one so navigation is stable.
+ * Nav links to top-level pages. Logo moved to Header (ILE-21).
+ * Active route indicated by `.spine` accent bar (ILE-21).
  */
 
 type NavItem = {
@@ -41,21 +40,15 @@ export function Sidebar() {
     <Box
       component="aside"
       w={240}
-      h="100vh"
+      h="100%"
       className="bg-surface-elevated backdrop-blur-elevated"
       style={{
         borderRight: chromeBorder,
-        position: 'sticky',
-        top: 0,
         flexShrink: 0,
         display: 'flex',
         flexDirection: 'column',
       }}
     >
-      <Box py="md" px="md" style={{ borderBottom: chromeBorder }}>
-        <Image src="/ilex_logo_v4.svg" alt="Ilex Inventory" h={28} fit="contain" w="auto" />
-      </Box>
-
       <Stack gap={2} p="xs" flex={1}>
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon
@@ -77,14 +70,17 @@ export function Sidebar() {
           }
 
           return (
-            <NavLink
-              key={item.to}
-              component={Link}
-              to={item.to}
-              label={item.label}
-              leftSection={<Icon size={16} />}
-              active={isActive}
-            />
+            <Box key={item.to} style={{ position: 'relative' }}>
+              {isActive && <Box className="spine" aria-hidden data-testid="spine" />}
+              <NavLink
+                component={Link}
+                to={item.to}
+                label={item.label}
+                leftSection={<Icon size={16} />}
+                active={isActive}
+                styles={{ root: { background: 'transparent' } }}
+              />
+            </Box>
           )
         })}
       </Stack>

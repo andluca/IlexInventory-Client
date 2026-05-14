@@ -1,6 +1,6 @@
 # ILE-20 — Shared shell primitives: PageHeader + ErrorState + StatusBanner
 
-Status: planned
+Status: completed
 
 ## Overview
 
