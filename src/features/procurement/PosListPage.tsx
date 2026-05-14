@@ -5,12 +5,13 @@
 
 import { useState, useEffect } from 'react'
 import { useNavigate, useSearch, Link } from '@tanstack/react-router'
-import { Title, Group, Button, Alert, Stack, Box, Text } from '@mantine/core'
+import { Group, Button, Stack, Box, Text } from '@mantine/core'
 import { IconPlus } from '@tabler/icons-react'
 import { usePosList } from '@/data/procurement/queries'
-import { ApiError } from '@/api/errors'
 import { LoadingSkeleton } from '@/components/LoadingSkeleton'
 import { EmptyState } from '@/components/EmptyState'
+import { PageHeader } from '@/components/PageHeader'
+import { ErrorState } from '@/components/ErrorState'
 import { PosListFilters } from './PosListFilters'
 import { PosListTable } from './PosListTable'
 import { buildPosListUrl } from './utils'
@@ -46,12 +47,14 @@ export function PosListPage() {
   const navPage = (p: number) => void navigate({ to: '/purchase-orders', search: buildPosListUrl({ status, search, page: p }) })
   return (
     <Stack p="xl" gap="md">
-      <Group justify="space-between">
-        <Title order={1}>Purchase Orders</Title>
-        <Button component={Link} to="/purchase-orders/new" leftSection={<IconPlus size={14} />}>New PO</Button>
-      </Group>
+      <PageHeader
+        title="Purchase Orders"
+        actions={
+          <Button component={Link} to="/purchase-orders/new" leftSection={<IconPlus size={14} />}>New PO</Button>
+        }
+      />
       <PosListFilters localSearch={localSearch} status={status} onSearchChange={setLocalSearch} onStatusChange={navStatus} />
-      {list.error && <Alert color="red">{ApiError.is(list.error) ? (list.error.detail ?? list.error.error) : 'Failed to load'}</Alert>}
+      {list.error && <ErrorState error={list.error} />}
       {list.isLoading && <LoadingSkeleton rows={5} />}
       {list.isSuccess && items.length === 0 && !hasFilters && (
         <EmptyState title="No purchase orders yet" body="Create your first PO to start receiving inventory."

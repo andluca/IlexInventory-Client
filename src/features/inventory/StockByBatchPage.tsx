@@ -5,13 +5,14 @@
 
 import { useState, useEffect } from 'react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
-import { Title, Group, Button, Alert, Stack, Box, Text } from '@mantine/core'
+import { Group, Button, Stack, Box, Text } from '@mantine/core'
 import { IconPlus } from '@tabler/icons-react'
 import { useBatchesList } from '@/data/inventory/queries'
 import { useProductsList } from '@/data/catalog/queries'
-import { ApiError } from '@/api/errors'
 import { LoadingSkeleton } from '@/components/LoadingSkeleton'
 import { EmptyState } from '@/components/EmptyState'
+import { PageHeader } from '@/components/PageHeader'
+import { ErrorState } from '@/components/ErrorState'
 import { ManualBatchModal } from './ManualBatchModal'
 import { StockListFilters } from './StockListFilters'
 import { StockListTable } from './StockListTable'
@@ -47,15 +48,17 @@ export function StockByBatchPage() {
   const go = (p: Parameters<typeof buildStockListUrl>[0]) => void navigate({ to: '/stock', search: buildStockListUrl(p) })
   return (
     <Stack p="xl" gap="md">
-      <Group justify="space-between">
-        <Title order={1}>Stock</Title>
-        <Button leftSection={<IconPlus size={14} />} onClick={() => setManualBatchOpen(true)}>New batch</Button>
-      </Group>
+      <PageHeader
+        title="Stock"
+        actions={
+          <Button leftSection={<IconPlus size={14} />} onClick={() => setManualBatchOpen(true)}>New batch</Button>
+        }
+      />
       <StockListFilters productId={productId} recallFilter={recallFilter as 'all' | 'active' | 'recalled'} localExpiring={localExpiring}
         productOptions={productOptions} onProductChange={(v) => go({ product_id: v && v !== '' ? v : undefined, is_recalled: isRecalled, expiring_within: expiring, page: 1 })}
         onRecallChange={(v) => go({ product_id: productId, is_recalled: v === 'recalled' ? true : v === 'active' ? false : undefined, expiring_within: expiring, page: 1 })}
         onExpiringChange={setLocalExpiring} />
-      {batchList.error && <Alert color="red">{ApiError.is(batchList.error) ? (batchList.error.detail ?? batchList.error.error) : 'Failed to load'}</Alert>}
+      {batchList.error && <ErrorState error={batchList.error} />}
       {batchList.isLoading && <LoadingSkeleton rows={5} />}
       {batchList.isSuccess && items.length === 0 && !hasFilters && (
         <EmptyState title="No batches yet" body="Receive a PO or create a batch manually to see stock here."

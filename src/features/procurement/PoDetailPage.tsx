@@ -10,7 +10,6 @@
 import { useState } from 'react'
 import { useNavigate, Link } from '@tanstack/react-router'
 import {
-  Alert,
   Badge,
   Box,
   Button,
@@ -28,6 +27,8 @@ import { usePo } from '@/data/procurement/queries'
 import { useDeletePo } from '@/data/procurement/mutations'
 import { ApiError } from '@/api/errors'
 import { LoadingSkeleton } from '@/components/LoadingSkeleton'
+import { PageHeader } from '@/components/PageHeader'
+import { ErrorState } from '@/components/ErrorState'
 import { ReceiveModal } from './ReceiveModal'
 
 export function PoDetailPage({ poId }: { poId: string }) {
@@ -60,9 +61,7 @@ export function PoDetailPage({ poId }: { poId: string }) {
   if (po.error) {
     return (
       <Stack p="xl">
-        <Alert color="red">
-          {ApiError.is(po.error) ? (po.error.detail ?? po.error.error) : 'Failed to load'}
-        </Alert>
+        <ErrorState error={po.error} />
       </Stack>
     )
   }
@@ -104,54 +103,52 @@ export function PoDetailPage({ poId }: { poId: string }) {
         </Button>
       </Group>
 
-      <Group justify="space-between" align="flex-start">
-        <Stack gap={4}>
-          <Title order={1}>{po.data.supplier_name}</Title>
-          {po.data.supplier_contact && (
-            <Text c="dimmed">{po.data.supplier_contact}</Text>
-          )}
-          <Group gap="xs" mt="xs">
-            <Badge color={isReceived ? 'green' : 'gray'} variant="light">
-              {po.data.status}
-            </Badge>
-            <Text size="sm" c="dimmed">
-              Created {new Date(po.data.created_at).toLocaleString()}
-            </Text>
-            {po.data.received_at && (
-              <Text size="sm" c="dimmed">
-                · Received {new Date(po.data.received_at).toLocaleString()}
-              </Text>
-            )}
-          </Group>
-        </Stack>
-
-        {!isReceived && (
-          <Group>
-            <Button
-              variant="subtle"
-              leftSection={<IconEdit size={14} />}
-              onClick={() =>
-                void navigate({ to: '/purchase-orders/$id/edit', params: { id: poId } })
-              }
-            >
-              Edit
-            </Button>
-            <Button
-              variant="subtle"
-              color="red"
-              leftSection={<IconTrash size={14} />}
-              onClick={() => setConfirmDelete(true)}
-            >
-              Delete
-            </Button>
-            <Button
-              color="green"
-              leftSection={<IconChecklist size={14} />}
-              onClick={() => setReceiveOpen(true)}
-            >
-              Receive
-            </Button>
-          </Group>
+      <PageHeader
+        contextTag={`PO-${poId}`}
+        title={po.data.supplier_name}
+        subtitle={po.data.supplier_contact ?? undefined}
+        actions={
+          !isReceived ? (
+            <Group>
+              <Button
+                variant="subtle"
+                leftSection={<IconEdit size={14} />}
+                onClick={() =>
+                  void navigate({ to: '/purchase-orders/$id/edit', params: { id: poId } })
+                }
+              >
+                Edit
+              </Button>
+              <Button
+                variant="subtle"
+                color="red"
+                leftSection={<IconTrash size={14} />}
+                onClick={() => setConfirmDelete(true)}
+              >
+                Delete
+              </Button>
+              <Button
+                color="green"
+                leftSection={<IconChecklist size={14} />}
+                onClick={() => setReceiveOpen(true)}
+              >
+                Receive
+              </Button>
+            </Group>
+          ) : undefined
+        }
+      />
+      <Group gap="xs">
+        <Badge color={isReceived ? 'green' : 'gray'} variant="light">
+          {po.data.status}
+        </Badge>
+        <Text size="sm" c="dimmed">
+          Created {new Date(po.data.created_at).toLocaleString()}
+        </Text>
+        {po.data.received_at && (
+          <Text size="sm" c="dimmed">
+            · Received {new Date(po.data.received_at).toLocaleString()}
+          </Text>
         )}
       </Group>
 

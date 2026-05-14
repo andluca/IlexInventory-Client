@@ -9,7 +9,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import {
-  Alert,
   Badge,
   Box,
   Button,
@@ -20,12 +19,15 @@ import {
   Text,
   Title,
 } from '@mantine/core'
-import { IconArrowLeft } from '@tabler/icons-react'
+import { IconArrowLeft, IconBan } from '@tabler/icons-react'
 import { notifications } from '@mantine/notifications'
 import { useSo } from '@/data/sales/queries'
 import { ApiError } from '@/api/errors'
 import { useActModalBus } from '@/stores/act-modal-bus'
 import { LoadingSkeleton } from '@/components/LoadingSkeleton'
+import { PageHeader } from '@/components/PageHeader'
+import { ErrorState } from '@/components/ErrorState'
+import { StatusBanner } from '@/components/StatusBanner'
 import { AllocationsTable } from './AllocationsTable'
 import { VoidConfirmModal } from './VoidConfirmModal'
 import { formatMoney } from '@/utils/money'
@@ -95,9 +97,7 @@ export function SoDetailPage({ soId }: { soId: string }) {
   if (so.error) {
     return (
       <Stack p="xl">
-        <Alert color="red">
-          {ApiError.is(so.error) ? (so.error.detail ?? so.error.error) : 'Failed to load'}
-        </Alert>
+        <ErrorState error={so.error} />
       </Stack>
     )
   }
@@ -139,49 +139,37 @@ export function SoDetailPage({ soId }: { soId: string }) {
 
       {/* Voided banner */}
       {isVoided && (
-        <Alert color="red" title="Voided">
-          Voided at {data.voided_at ? new Date(data.voided_at).toLocaleString() : '—'}.
-        </Alert>
+        <StatusBanner tone="clay" icon={<IconBan size={16} />}>
+          This sales order was voided on {data.voided_at ? new Date(data.voided_at).toLocaleString() : '—'}.
+        </StatusBanner>
       )}
 
       {/* Header */}
-      <Group justify="space-between" align="flex-start">
-        <Stack gap={4}>
-          <Title order={2}>{data.customer_name}</Title>
-          {data.customer_contact && (
-            <Text c="dimmed">{data.customer_contact}</Text>
-          )}
-          <Text ff="monospace" size="sm" c="dimmed">
-            {data.id.slice(0, 8)}
-          </Text>
-          <Group gap="xs" mt="xs">
-            <Badge color={statusBadgeColor(status)} variant="light">
-              {status}
-            </Badge>
-            {data.committed_at && (
-              <Text size="sm" c="dimmed">
-                Committed {new Date(data.committed_at).toLocaleString()}
-              </Text>
-            )}
-            {data.voided_at && (
-              <Text size="sm" c="dimmed">
-                · Voided {new Date(data.voided_at).toLocaleString()}
-              </Text>
-            )}
-          </Group>
-        </Stack>
-
-        {/* Action bar */}
-        {isCommitted && (
-          <Group>
-            <Button
-              color="red"
-              variant="light"
-              onClick={() => setVoidOpen(true)}
-            >
+      <PageHeader
+        contextTag={`SO-${soId}`}
+        title={data.customer_name}
+        subtitle={data.customer_contact ?? undefined}
+        actions={
+          isCommitted ? (
+            <Button color="red" variant="light" onClick={() => setVoidOpen(true)}>
               Void
             </Button>
-          </Group>
+          ) : undefined
+        }
+      />
+      <Group gap="xs">
+        <Badge color={statusBadgeColor(status)} variant="light">
+          {status}
+        </Badge>
+        {data.committed_at && (
+          <Text size="sm" c="dimmed">
+            Committed {new Date(data.committed_at).toLocaleString()}
+          </Text>
+        )}
+        {data.voided_at && (
+          <Text size="sm" c="dimmed">
+            · Voided {new Date(data.voided_at).toLocaleString()}
+          </Text>
         )}
       </Group>
 

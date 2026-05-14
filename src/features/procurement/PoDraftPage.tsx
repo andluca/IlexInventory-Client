@@ -22,6 +22,7 @@ import { useForm } from '@mantine/form'
 import { usePo } from '@/data/procurement/queries'
 import { useCreatePo, useUpdatePo } from '@/data/procurement/mutations'
 import { ApiError } from '@/api/errors'
+import { PageHeader } from '@/components/PageHeader'
 import { PoLineEditor, type DraftLine } from './PoLineEditor'
 
 interface PoDraftPageProps {
@@ -132,7 +133,7 @@ export function PoDraftPage({ poId }: PoDraftPageProps) {
 
   return (
     <Stack p="xl" gap="lg" maw={960}>
-      <Title order={1}>{isEdit ? 'Edit purchase order' : 'New purchase order'}</Title>
+      <PageHeader title={isEdit ? 'Edit purchase order' : 'New purchase order'} />
 
       {alertMsg && <Alert color="red">{alertMsg}</Alert>}
 

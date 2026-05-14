@@ -16,7 +16,6 @@
 
 import { Link } from '@tanstack/react-router'
 import {
-  Alert,
   Badge,
   Button,
   Card,
@@ -26,7 +25,7 @@ import {
   Text,
   Title,
 } from '@mantine/core'
-import { IconArrowLeft } from '@tabler/icons-react'
+import { IconArrowLeft, IconAlertOctagon } from '@tabler/icons-react'
 import { useBatch } from '@/data/inventory/queries'
 import { useRecallReport } from '@/data/inventory/queries'
 import { useProduct } from '@/data/catalog/queries'
@@ -34,6 +33,9 @@ import { ApiError } from '@/api/errors'
 import { CsvExportButton } from '@/components/CsvExportButton'
 import { EmptyState } from '@/components/EmptyState'
 import { LoadingSkeleton } from '@/components/LoadingSkeleton'
+import { PageHeader } from '@/components/PageHeader'
+import { ErrorState } from '@/components/ErrorState'
+import { StatusBanner } from '@/components/StatusBanner'
 
 export function RecallReportPage({ batchId }: { batchId: string }) {
   const batch = useBatch(batchId)
@@ -54,9 +56,7 @@ export function RecallReportPage({ batchId }: { batchId: string }) {
   if (batch.error) {
     return (
       <Stack p="xl">
-        <Alert color="red">
-          {ApiError.is(batch.error) ? (batch.error.detail ?? batch.error.error) : 'Failed to load'}
-        </Alert>
+        <ErrorState error={batch.error} />
       </Stack>
     )
   }
@@ -64,11 +64,7 @@ export function RecallReportPage({ batchId }: { batchId: string }) {
   if (recallReport.error) {
     return (
       <Stack p="xl">
-        <Alert color="red">
-          {ApiError.is(recallReport.error)
-            ? (recallReport.error.detail ?? recallReport.error.error)
-            : 'Failed to load recall report'}
-        </Alert>
+        <ErrorState error={recallReport.error} />
       </Stack>
     )
   }
@@ -93,41 +89,34 @@ export function RecallReportPage({ batchId }: { batchId: string }) {
         </Button>
       </Group>
 
+      {/* Always-visible recall report status banner */}
+      <StatusBanner tone="clay" icon={<IconAlertOctagon size={16} />}>
+        Recall report for batch {b.batch_code}.
+      </StatusBanner>
+
       {/* Header */}
-      <Card withBorder p="lg">
-        <Stack gap="sm">
-          <Title order={2}>
-            Recall report — Batch{' '}
-            <Text component="span" ff="monospace" fw={700} inherit>
-              {b.batch_code}
-            </Text>
-          </Title>
+      <PageHeader
+        contextTag={b.batch_code}
+        title={product.data ? `Recall report — ${product.data.name}` : `Recall report — Batch ${b.batch_code}`}
+      />
 
-          {product.data && (
-            <Text size="lg" fw={500}>
-              {product.data.name}
+      {b.is_recalled && (
+        <Group gap="sm">
+          <Badge color="red" variant="filled">
+            Recalled
+          </Badge>
+          {b.recalled_at && (
+            <Text size="sm" c="dimmed">
+              {new Date(b.recalled_at).toLocaleDateString()}
             </Text>
           )}
-
-          {b.is_recalled && (
-            <Group gap="sm">
-              <Badge color="red" variant="filled">
-                Recalled
-              </Badge>
-              {b.recalled_at && (
-                <Text size="sm" c="dimmed">
-                  {new Date(b.recalled_at).toLocaleDateString()}
-                </Text>
-              )}
-              {b.recall_reason && (
-                <Text size="sm" c="dimmed">
-                  &quot;{b.recall_reason}&quot;
-                </Text>
-              )}
-            </Group>
+          {b.recall_reason && (
+            <Text size="sm" c="dimmed">
+              &quot;{b.recall_reason}&quot;
+            </Text>
           )}
-        </Stack>
-      </Card>
+        </Group>
+      )}
 
       {/* Body */}
       {items.length === 0 ? (

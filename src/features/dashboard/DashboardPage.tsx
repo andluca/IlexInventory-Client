@@ -21,6 +21,7 @@ import { FinancialSummary } from './FinancialSummary'
 import { MarginByProductTable } from './MarginByProductTable'
 import { DateRangePicker } from './DateRangePicker'
 import { ImportCsvModal } from '@/features/catalog/ImportCsvModal'
+import { PageHeader } from '@/components/PageHeader'
 
 export interface DashboardPageProps {
   /** ISO date override for tests — makes default computations deterministic. */
@@ -65,6 +66,8 @@ export function DashboardPage({ today }: DashboardPageProps) {
 
   return (
     <Stack p="xl" gap="lg">
+      <PageHeader title="Dashboard" />
+
       {/* Quick actions row */}
       <QuickActions onImportClick={() => setImportOpen(true)} />
 

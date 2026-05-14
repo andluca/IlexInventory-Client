@@ -194,8 +194,9 @@ describe('SoDetailPage', () => {
       expect(screen.getByText('Acme Corp')).toBeInTheDocument()
     })
 
-    // Voided banner
-    expect(screen.getByText(/Voided at/)).toBeInTheDocument()
+    // Voided StatusBanner (role="status")
+    expect(screen.getByRole('status')).toBeInTheDocument()
+    expect(screen.getByRole('status').textContent).toMatch(/this sales order was voided on/i)
     // No Void button when already voided
     expect(screen.queryByRole('button', { name: /^void$/i })).not.toBeInTheDocument()
     // Allocations still visible (batch links rendered)

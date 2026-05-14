@@ -177,7 +177,7 @@ describe('BatchDetailPage', () => {
     expect(screen.getByRole('link', { name: /back to stock/i })).toBeInTheDocument()
   })
 
-  it('recalled batch: shows red recall banner with reason, Un-recall button, action bar disabled', async () => {
+  it('recalled batch: shows clay StatusBanner, Un-recall button, action bar disabled', async () => {
     server.use(
       http.get('http://localhost:8000/api/v1/batches/batch-1', () =>
         HttpResponse.json(BATCH_RECALLED),
@@ -196,11 +196,13 @@ describe('BatchDetailPage', () => {
     const router = await makeRouter('batch-1')
     await renderWithRouter(router)
 
+    // StatusBanner (role="status") shows the recalled-on text
     await waitFor(() => {
-      expect(screen.getByText(/Recalled — Listeria detected/)).toBeInTheDocument()
+      expect(screen.getByRole('status')).toBeInTheDocument()
     })
+    expect(screen.getByRole('status').textContent).toMatch(/this batch was recalled on/i)
 
-    // Un-recall button visible (may appear in banner and action bar)
+    // Un-recall button visible in action bar
     expect(screen.getAllByRole('button', { name: /un-recall/i }).length).toBeGreaterThan(0)
 
     // Adjust and Write off should be disabled
@@ -384,7 +386,7 @@ describe('BatchDetailPage', () => {
     await renderWithRouter(router)
 
     await waitFor(() => {
-      expect(screen.getByText(/Listeria detected/)).toBeInTheDocument()
+      expect(screen.getByRole('status')).toBeInTheDocument()
     })
 
     // Fire the bus request — should open the UnRecallModal

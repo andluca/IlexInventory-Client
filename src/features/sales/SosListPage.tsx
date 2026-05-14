@@ -5,12 +5,13 @@
 
 import { useState, useEffect } from 'react'
 import { useNavigate, useSearch, Link } from '@tanstack/react-router'
-import { Title, Group, Button, Alert, Stack, Box, Text } from '@mantine/core'
+import { Group, Button, Stack, Box, Text } from '@mantine/core'
 import { IconPlus } from '@tabler/icons-react'
 import { useSosList } from '@/data/sales/queries'
-import { ApiError } from '@/api/errors'
 import { LoadingSkeleton } from '@/components/LoadingSkeleton'
 import { EmptyState } from '@/components/EmptyState'
+import { PageHeader } from '@/components/PageHeader'
+import { ErrorState } from '@/components/ErrorState'
 import { SosListFilters } from './SosListFilters'
 import { SosListTable } from './SosListTable'
 import { buildSosListUrl } from './utils'
@@ -40,12 +41,14 @@ export function SosListPage() {
   const nav = (s: SF) => void navigate({ to: '/sales-orders', search: buildSosListUrl({ status: s, search }) })
   return (
     <Stack p="xl" gap="md">
-      <Group justify="space-between">
-        <Title order={1}>Sales Orders</Title>
-        <Button component={Link} to="/sales-orders/new" leftSection={<IconPlus size={14} />}>New SO</Button>
-      </Group>
+      <PageHeader
+        title="Sales Orders"
+        actions={
+          <Button component={Link} to="/sales-orders/new" leftSection={<IconPlus size={14} />}>New SO</Button>
+        }
+      />
       <SosListFilters localSearch={localSearch} status={status} onSearchChange={setLocalSearch} onStatusChange={nav} />
-      {list.error && <Alert color="red">{ApiError.is(list.error) ? (list.error.detail ?? list.error.error) : 'Failed to load'}</Alert>}
+      {list.error && <ErrorState error={list.error} />}
       {list.isLoading && <LoadingSkeleton rows={5} />}
       {list.isSuccess && items.length === 0 && !hasFilters && (
         <EmptyState title="No sales orders yet" body="Draft your first SO to see FEFO in action."

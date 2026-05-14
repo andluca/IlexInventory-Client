@@ -5,10 +5,11 @@
 
 import { useState, useEffect } from 'react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
-import { Title, Group, Button, Alert, Stack, Text, Box } from '@mantine/core'
+import { Group, Button, Stack, Text, Box } from '@mantine/core'
 import { useProductsList } from '@/data/catalog/queries'
-import { ApiError } from '@/api/errors'
 import { EmptyState } from '@/components/EmptyState'
+import { PageHeader } from '@/components/PageHeader'
+import { ErrorState } from '@/components/ErrorState'
 import { NewProductModal } from './NewProductModal'
 import { ImportCsvModal } from './ImportCsvModal'
 import { ProductsListFilters } from './ProductsListFilters'
@@ -46,13 +47,18 @@ export function ProductsListPage() {
   return (
     <Box p="md">
       <Stack gap="md">
-        <Group justify="space-between" align="center">
-          <Title order={1}>Products</Title>
-          <Group gap="sm"><Button variant="default" onClick={() => setImportCsvOpened(true)}>Import CSV</Button><Button onClick={() => setNewProductOpened(true)}>New product</Button></Group>
-        </Group>
+        <PageHeader
+          title="Products"
+          actions={
+            <Group gap="sm">
+              <Button variant="default" onClick={() => setImportCsvOpened(true)}>Import CSV</Button>
+              <Button onClick={() => setNewProductOpened(true)}>New product</Button>
+            </Group>
+          }
+        />
         <ProductsListFilters localSearch={localSearch} archivedSegValue={seg as 'active' | 'all' | 'archived'}
           onSearchChange={setLocalSearch} onArchivedChange={handleArchivedChange} />
-        {isError && <Alert color="red">{ApiError.is(error) ? (error.detail ?? error.error) : 'An error occurred'}</Alert>}
+        {isError && <ErrorState error={error} />}
         {!isError && total === 0 && !hasFilters && (
           <EmptyState title="No products yet" body="Create your first product or import from CSV."
             actions={[{ label: 'New product', onClick: () => setNewProductOpened(true), primary: true }, { label: 'Import CSV', onClick: () => setImportCsvOpened(true) }]}

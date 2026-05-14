@@ -1,8 +1,9 @@
 import { useNavigate } from '@tanstack/react-router'
-import { Card, Stack, Title, Text, Button, Group, Code } from '@mantine/core'
+import { Card, Stack, Text, Button, Group, Code } from '@mantine/core'
 import { IconLogout } from '@tabler/icons-react'
 import { useAuthMe } from '@/data/auth/queries'
 import { useLogoutMutation } from '@/data/auth/mutations'
+import { PageHeader } from '@/components/PageHeader'
 
 /**
  * SettingsPage — v1 surface intentionally thin (SPEC §2.7 / §3.8).
@@ -24,7 +25,7 @@ export function SettingsPage() {
 
   return (
     <Stack p="xl" maw={640}>
-      <Title order={1}>Settings</Title>
+      <PageHeader title="Settings" />
 
       <Card withBorder p="lg">
         <Stack>

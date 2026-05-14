@@ -31,6 +31,7 @@ import { usePreviewSo } from '@/data/sales/queries'
 import { useCreateSo, useUpdateSo } from '@/data/sales/mutations'
 import { ApiError } from '@/api/errors'
 import { useActModalBus } from '@/stores/act-modal-bus'
+import { PageHeader } from '@/components/PageHeader'
 import { SoLineEditor, type DraftSoLine } from './SoLineEditor'
 import { FefoPreview } from './FefoPreview'
 import { CommitConfirmModal } from './CommitConfirmModal'
@@ -193,7 +194,7 @@ export function SoDraftPage({ soId }: SoDraftPageProps) {
 
   return (
     <Stack p="xl" gap="lg">
-      <Title order={1}>{isEdit ? 'Edit sales order' : 'New sales order'}</Title>
+      <PageHeader title={isEdit ? 'Edit sales order' : 'New sales order'} />
 
       {alertMsg && <Alert color="red">{alertMsg}</Alert>}
 

@@ -82,22 +82,28 @@ if grep -RE "console\.(log|debug)" src/ --include='*.ts' --include='*.tsx' 2>/de
 fi
 
 # ---------------------------------------------------------------------------
-# Gate 7: api/generated not imported from src/data/ directly from features/routes
-# (Duplicate-ish of gate 4, but enforced at data-layer imports too per SPEC §2.2)
-# Actually gate 7 from SPEC §4 is the NumberInput one — let me align exactly.
-# The seven greps from SPEC §4:
-#  1. grep -RE "\b(fetch|axios)\(" src/features/ src/routes/
-#  2. grep -RE "(fetch|axios)\(" src/ ... | grep -vE "src/data/|src/api/|src/utils/csv-export\.ts"
-#  3. grep -RE "as any" ... | grep -v "src/api/generated"
-#  4. grep -RE "from ['\"].*api/generated" src/features/ src/routes/
-#  5. grep -RE "\bNumberInput\b" src/features/
-# That's five in the SPEC block. The full set of CI gates from §2.2 + §4:
-#  - tsc --noEmit (typecheck)
-#  - npm test
-#  - npm run generate:api -- --check
-#  - the five greps above
-# Gates 6 and 7 (console.log/debug, no-any) are enforced above as extras.
+# Gate 7: No inline <Title order={1}> in src/features/ (use <PageHeader>)
+# Excludes src/components/ where PageHeader itself renders <Title order={1}>.
 # ---------------------------------------------------------------------------
+echo "Gate 7: no inline <Title order={1}> in src/features/..."
+GATE7=$(grep -RE "<Title order=\{1\}" src/features/ 2>/dev/null || true)
+if [ -n "$GATE7" ]; then
+  fail "inline <Title order={1}> found in src/features/ — use <PageHeader>:"
+  echo "$GATE7"
+fi
+
+# ---------------------------------------------------------------------------
+# Gate 8: No inline ApiError red <Alert> in src/features/ (use <ErrorState>)
+# Specifically checks for the pattern where ApiError.is() is evaluated inside
+# a red Alert — the form that should be replaced by <ErrorState error={...} />.
+# Non-ApiError alertMsg strings in modals/forms are permitted.
+# ---------------------------------------------------------------------------
+echo "Gate 8: no inline ApiError <Alert color=\"red\"> in src/features/..."
+GATE8=$(grep -RE "Alert[^>]*color=\"red\"[^>]*>.*ApiError\.is\|ApiError\.is.*Alert[^>]*color=\"red\"" src/features/ 2>/dev/null || true)
+if [ -n "$GATE8" ]; then
+  fail "inline ApiError <Alert color=\"red\"> found in src/features/ — use <ErrorState>:"
+  echo "$GATE8"
+fi
 
 echo ""
 if [ "$FAILED" -ne 0 ]; then

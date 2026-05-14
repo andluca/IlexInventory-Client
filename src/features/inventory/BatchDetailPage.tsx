@@ -13,7 +13,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from '@tanstack/react-router'
 import {
-  Alert,
   Badge,
   Button,
   Card,
@@ -23,7 +22,7 @@ import {
   Title,
 } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
-import { IconArrowLeft, IconPlus } from '@tabler/icons-react'
+import { IconArrowLeft, IconPlus, IconAlertOctagon } from '@tabler/icons-react'
 import { useBatch } from '@/data/inventory/queries'
 import { useProduct } from '@/data/catalog/queries'
 import { ApiError } from '@/api/errors'
@@ -33,6 +32,9 @@ import type { BaseUnit } from '@/utils/qty'
 import { MovementAuditTable } from '@/components/MovementAuditTable'
 import { CsvExportButton } from '@/components/CsvExportButton'
 import { LoadingSkeleton } from '@/components/LoadingSkeleton'
+import { PageHeader } from '@/components/PageHeader'
+import { ErrorState } from '@/components/ErrorState'
+import { StatusBanner } from '@/components/StatusBanner'
 import { useActModalBus } from '@/stores/act-modal-bus'
 import { BatchMetadataEditor } from './BatchMetadataEditor'
 import { AdjustModal } from './AdjustModal'
@@ -95,9 +97,7 @@ export function BatchDetailPage({ batchId }: { batchId: string }) {
   if (batch.error) {
     return (
       <Stack p="xl">
-        <Alert color="red">
-          {ApiError.is(batch.error) ? (batch.error.detail ?? batch.error.error) : 'Failed to load'}
-        </Alert>
+        <ErrorState error={batch.error} />
       </Stack>
     )
   }
@@ -147,43 +147,30 @@ export function BatchDetailPage({ batchId }: { batchId: string }) {
 
       {/* Recall banner */}
       {isRecalled && (
-        <Alert color="red" title="Recalled">
-          Recalled — {b.recall_reason}. Recalled at {b.recalled_at ? new Date(b.recalled_at).toLocaleString() : '—'}.
-          <Button
-            variant="subtle"
-            color="red"
-            size="xs"
-            mt="xs"
-            onClick={() => setUnRecallOpen(true)}
-          >
-            Un-recall
-          </Button>
-        </Alert>
+        <StatusBanner tone="clay" icon={<IconAlertOctagon size={16} />}>
+          This batch was recalled on {b.recalled_at ? new Date(b.recalled_at).toLocaleString() : '—'}.
+        </StatusBanner>
       )}
 
       {/* Header */}
+      <PageHeader
+        contextTag={b.batch_code}
+        title={product.data?.name ?? b.product_id.slice(0, 8)}
+      />
       <Card withBorder p="lg">
         <Stack gap="sm">
-          <Group justify="space-between" align="flex-start">
-            <Stack gap={4}>
-              <Title order={2}>{product.data?.name ?? b.product_id.slice(0, 8)}</Title>
-              <Text ff="monospace" fw={600}>
-                {b.batch_code}
-              </Text>
-              {b.expiration_date && (
-                <Badge color="orange" variant="light">
-                  Expires: {b.expiration_date}
-                </Badge>
-              )}
-              <Group gap="md">
-                <Text size="sm">
-                  On hand: <strong>{formatQty(b.on_hand, baseUnit)}</strong>
-                </Text>
-                <Text size="sm">
-                  Unit cost: <strong>{formatMoney(b.unit_cost)}</strong>
-                </Text>
-              </Group>
-            </Stack>
+          {b.expiration_date && (
+            <Badge color="orange" variant="light">
+              Expires: {b.expiration_date}
+            </Badge>
+          )}
+          <Group gap="md">
+            <Text size="sm">
+              On hand: <strong>{formatQty(b.on_hand, baseUnit)}</strong>
+            </Text>
+            <Text size="sm">
+              Unit cost: <strong>{formatMoney(b.unit_cost)}</strong>
+            </Text>
           </Group>
 
           {/* Metadata editor */}

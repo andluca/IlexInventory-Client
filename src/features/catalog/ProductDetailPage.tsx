@@ -7,7 +7,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from '@tanstack/react-router'
 import { useForm } from '@mantine/form'
-import { Button, Text, Stack, Box, Alert, Divider } from '@mantine/core'
+import { Badge, Button, Text, Stack, Box, Divider, Group } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 import { useProduct } from '@/data/catalog/queries'
 import { useUpdateProduct } from '@/data/catalog/mutations'
@@ -16,9 +16,10 @@ import { ApiError } from '@/api/errors'
 import { useActModalBus } from '@/stores/act-modal-bus'
 import { LoadingSkeleton } from '@/components/LoadingSkeleton'
 import { MovementAuditTable } from '@/components/MovementAuditTable'
+import { PageHeader } from '@/components/PageHeader'
+import { ErrorState } from '@/components/ErrorState'
 import { ArchiveConfirmModal } from './ArchiveConfirmModal'
 import { DeleteConfirmModal } from './DeleteConfirmModal'
-import { ProductDetailHeader } from './ProductDetailHeader'
 import { ProductDetailActions } from './ProductDetailActions'
 import { ProductDetailForm } from './ProductDetailForm'
 
@@ -53,7 +54,7 @@ export function ProductDetailPage() {
       <Button variant="subtle" onClick={() => void navigate({ to: '/products', search: { page: 1, search: undefined, archived: undefined } })}>Back to products</Button>
     </Stack></Box>
   }
-  if (isError) return <Box p="md"><Alert color="red">{ApiError.is(error) ? (error.detail ?? error.error) : 'An error occurred'}</Alert></Box>
+  if (isError) return <Box p="md"><ErrorState error={error} /></Box>
   if (isLoading || !product) return <Box p="md"><LoadingSkeleton rows={5} /></Box>
   function handleSave(values: typeof form.values) {
     updateProduct.mutate({ id, name: values.name, description: values.description }, {
@@ -65,9 +66,23 @@ export function ProductDetailPage() {
   }
   return (
     <Box p="md"><Stack gap="lg">
-      <ProductDetailHeader product={product} />
-      <ProductDetailActions product={product} hasBatches={(batchesData?.total ?? 0) > 0} batchesLoading={batchesLoading}
-        onArchive={() => setArchiveOpen(true)} onDelete={() => setDeleteOpen(true)} />
+      <PageHeader
+        contextTag={product.sku}
+        title={product.name}
+        subtitle={product.archived_at ? 'Archived' : undefined}
+        actions={
+          <ProductDetailActions
+            product={product}
+            hasBatches={(batchesData?.total ?? 0) > 0}
+            batchesLoading={batchesLoading}
+            onArchive={() => setArchiveOpen(true)}
+            onDelete={() => setDeleteOpen(true)}
+          />
+        }
+      />
+      <Group gap="sm">
+        <Badge variant="outline" size="sm">Base unit: {product.base_unit}</Badge>
+      </Group>
       <Divider />
       <ProductDetailForm form={form} onSubmit={handleSave} pending={updateProduct.isPending} />
       <Divider />
